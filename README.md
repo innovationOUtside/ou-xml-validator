@@ -12,7 +12,7 @@ or
 
 To validate a single file:
 
-`ou_xml_validator validate  path./testme.xml`
+`ou_xml_validator validate path-to-file/testme.xml`
 
 ```text
 Usage: ou_xml_validator [OPTIONS] COMMAND [ARGS]...
