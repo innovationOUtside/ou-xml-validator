@@ -1,0 +1,2281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Peter Cox (The Open University) -->
+<!--OU Structured Authoring Generic Schema for OpenLearn v1.10-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:mml="http://www.w3.org/1998/Math/MathML"
+	elementFormDefault="qualified">
+	<xsd:import namespace="http://www.w3.org/1998/Math/MathML"
+		schemaLocation="mathml3/xsd/mathml3.xsd"/>
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml/xml.xsd"/>
+	<xsd:element name="Item">
+		<xsd:annotation>
+			<xsd:documentation>Book or Block</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="meta" type="metaStructure" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="CourseCode" type="MixedContentStructure"/>
+				<xsd:element name="CourseTitle" type="RestrictedTitleStructure"/>
+				<xsd:element name="ItemID" type="MixedContentStructure"/>
+				<xsd:element name="ItemTitle" type="RestrictedTitleStructure"/>
+				<xsd:element name="Notice" type="NoticeStructure" minOccurs="0"/>
+				<xsd:element name="FrontMatter" type="FrontMatterStructure" minOccurs="0"/>
+				<xsd:element name="Unit" type="UnitStructure" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="BackMatter" type="BackMatterStructure" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="TextType" type="TextTypeType" use="required"/>
+			<xsd:attribute name="SchemaVersion" type="xsd:NMTOKEN" use="required" fixed="2.0"/>
+			<xsd:attribute name="id" type="xsd:string"/>
+			<xsd:attribute name="Template" type="ACSTemplateType"/>
+			<xsd:attribute name="PageStartNumber" type="xsd:string"/>
+			<xsd:attribute name="Rendering" type="LastRenderingType"/>
+			<xsd:attribute name="AlternativeLanguage" type="LanguageType"/>
+			<xsd:attribute ref="xml:lang"/>
+			<xsd:attribute name="DAISYIgnoreFigureDescriptions" type="xsd:boolean"/>
+			<xsd:attribute name="DiscussionAlias" type="DiscussionAliasType" default="Discussion"/>
+			<xsd:attribute name="SecondColour" type="ColourType"/>
+			<xsd:attribute name="ThirdColour" type="ColourType"/>
+			<xsd:attribute name="FourthColour" type="ColourType"/>
+			<xsd:attribute name="Logo" type="LogoType"/>
+			<xsd:attribute name="vleglossary" type="VLEglossaryType" default="auto"/>
+			<xsd:attribute name="Autonumber" type="xsd:boolean" default="false"/>
+			<xsd:attribute name="ExportedEquationLocation" type="xsd:string"/>
+			<xsd:attribute name="DisableAnnotation" type="xsd:boolean" default="false"/>
+		</xsd:complexType>
+		<xsd:unique name="UniqueId">
+			<xsd:selector xpath=".//*"/>
+			<xsd:field xpath="@id"/>
+		</xsd:unique>
+		<xsd:keyref name="KeyRefId" refer="UniqueId">
+			<xsd:selector xpath=".//Paragraph/CrossRef | .//InlineStructure/CrossRef"/>
+			<xsd:field xpath="@idref"/>
+		</xsd:keyref>
+		<xsd:unique name="FreeResponseId">
+			<xsd:selector xpath=".//FreeResponse"/>
+			<xsd:field xpath="@id"/>
+		</xsd:unique>
+		<xsd:keyref name="KeyRefFreeResponseId" refer="FreeResponseId">
+			<xsd:selector xpath=".//FreeResponseDisplay"/>
+			<xsd:field xpath="@idref"/>
+		</xsd:keyref>
+	</xsd:element>
+	<xsd:simpleType name="TextTypeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="CompleteItem"/>
+			<xsd:enumeration value="FrontMatter"/>
+			<xsd:enumeration value="BodyMatter"/>
+			<xsd:enumeration value="BackMatter"/>
+			<xsd:enumeration value="CourseGuide"/>
+			<xsd:enumeration value="StudyGuide"/>
+			<xsd:enumeration value="Introduction"/>
+			<xsd:enumeration value="Essay"/>
+			<xsd:enumeration value="Readings"/>
+			<xsd:enumeration value="Acknowledgements"/>
+			<xsd:enumeration value="References"/>
+			<xsd:enumeration value="Glossary"/>
+			<xsd:enumeration value="Index"/>
+			<xsd:enumeration value=""/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DiscussionAliasType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value=""/>
+			<xsd:enumeration value="Discussion"/>
+			<xsd:enumeration value="Comment"/>
+			<xsd:enumeration value="Feedback"/>
+			<xsd:enumeration value="Solution"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ColourType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="None"/>
+			<xsd:enumeration value="Black"/>
+			<xsd:enumeration value="OU_Orange"/>
+			<xsd:enumeration value="OU_Red"/>
+			<xsd:enumeration value="OU_Pink"/>
+			<xsd:enumeration value="OU_Violet"/>
+			<xsd:enumeration value="OU_Blue"/>
+			<xsd:enumeration value="OU_Turquoise"/>
+			<xsd:enumeration value="OUBS_Green"/>
+			<xsd:enumeration value="OUBS_Monochrome"/>
+			<xsd:enumeration value="TECH_Blue"/>
+			<xsd:enumeration value="TECH_DarkBlue"/>
+			<xsd:enumeration value="TECH_Green"/>
+			<xsd:enumeration value="Pantone2945C"/>
+			<xsd:enumeration value="Pantone314C"/>
+			<xsd:enumeration value="PantoneProcessBlueC"/>
+			<xsd:enumeration value="Pantone326C"/>
+			<xsd:enumeration value="Pantone356C"/>
+			<xsd:enumeration value="Pantone377C"/>
+			<xsd:enumeration value="Pantone272C"/>
+			<xsd:enumeration value="Pantone2603C"/>
+			<xsd:enumeration value="Pantone235C"/>
+			<xsd:enumeration value="Pantone201C"/>
+			<xsd:enumeration value="Pantone718C"/>
+			<xsd:enumeration value="Pantone179C"/>
+			<xsd:enumeration value="Pantone186C"/>
+			<xsd:enumeration value="Pantone226C"/>
+			<xsd:enumeration value="Pantone4525C"/>
+			<xsd:enumeration value="Pantone7413C"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LogoType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value=""/>
+			<xsd:enumeration value="monochrome"/>
+			<xsd:enumeration value="colour"/>
+			<xsd:enumeration value="oubsmonochrome"/>
+			<xsd:enumeration value="oubscolour"/>
+			<xsd:enumeration value="oulawmonochrome"/>
+			<xsd:enumeration value="oulawcolour"/>
+			<xsd:enumeration value="ouwelshmonochrome"/>
+			<xsd:enumeration value="ouwelshcolour"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VLEglossaryType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="auto"/>
+			<xsd:enumeration value="manual"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LastRenderingType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Draft PDF"/>
+			<xsd:enumeration value="Print PDF"/>
+			<xsd:enumeration value="Print PDF + crop marks"/>
+			<xsd:enumeration value="VLE2 modules (learn2)"/>
+			<xsd:enumeration value="VLE2 shared (learn1)"/>
+			<xsd:enumeration value="VLE2 staff (learn3)"/>
+			<xsd:enumeration value="Qualification website (learn4)"/>
+			<xsd:enumeration value="Open Science Lab (learn5)"/>
+			<xsd:enumeration value="Prison VLE (learn7)"/>
+			<xsd:enumeration value="XML"/>
+			<xsd:enumeration value="OpenLearn"/>
+			<xsd:enumeration value="OpenLearnCreate"/>
+			<xsd:enumeration value="Accessible"/>
+			<xsd:enumeration value="Alternative"/>
+			<xsd:enumeration value="Audiobook"/>
+			<xsd:enumeration value=""/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ACSTemplateListType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Generic_A4_Unnumbered"/>
+			<xsd:enumeration value="Generic_Supp"/>
+			<xsd:enumeration value="Wide_Margin_Reduced_A4"/>
+			<xsd:enumeration value="Garamond_Crown_Quarto"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ACSTemplateTextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ACSTemplateType">
+		<xsd:union memberTypes="ACSTemplateListType ACSTemplateTextType"/>
+	</xsd:simpleType>
+	<xsd:complexType name="NoticeStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:element name="Box" type="BoxStructure"/>
+				<xsd:element name="SubHeading" type="HeadingStructure"/>
+				<xsd:element name="SubSubHeading" type="HeadingStructure"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="FrontMatterStructure">
+		<xsd:sequence>
+			<xsd:element name="ByLine" type="ByLineStructure" minOccurs="0"/>
+			<xsd:element name="HalfTitleVerso" type="HalfTitleVersoStructure" minOccurs="0"/>
+			<xsd:element name="Imprint" type="ImprintStructure"/>
+			<xsd:element name="TOC" type="TOCstructure" minOccurs="0"/>
+			<xsd:element name="Preface" type="PrefaceStructure" minOccurs="0"/>
+			<xsd:element name="Introduction" type="IntroductionStructure" minOccurs="0"/>
+			<xsd:element name="LearningOutcomes" type="LearningOutcomesStructure" minOccurs="0"/>
+			<xsd:element name="Covers" type="CoversStructure" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="UnitStructure">
+		<xsd:annotation>
+			<xsd:documentation>Chapter or Unit</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="UnitID" type="MixedContentStructure"/>
+			<xsd:element name="UnitTitle" type="TitleStructure"/>
+			<xsd:element name="ByLine" type="ByLineStructure" minOccurs="0"/>
+			<xsd:element name="Introduction" type="IntroductionStructure" minOccurs="0"/>
+			<xsd:element name="LearningOutcomes" type="LearningOutcomesStructure" minOccurs="0"/>
+			<xsd:element name="Session" type="SessionStructure" maxOccurs="unbounded"/>
+			<xsd:element name="BackMatter" type="BackMatterStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="BackMatterStructure">
+		<xsd:sequence>
+			<xsd:element name="Conclusion" type="ConclusionStructure" minOccurs="0"/>
+			<xsd:element name="Glossary" type="GlossaryStructure" minOccurs="0"/>
+			<xsd:element name="References" type="ReferencesStructure" minOccurs="0"/>
+			<xsd:element name="FurtherReading" type="ReferencesStructure" minOccurs="0"/>
+			<xsd:element name="Acknowledgements" type="AcknowledgementsStructure" minOccurs="0"/>
+			<xsd:element name="Appendices" type="AppendicesStructure" minOccurs="0"/>
+			<xsd:element name="CourseTeam" type="CourseTeamStructure" minOccurs="0"/>
+			<xsd:element name="Index" type="IndexStructure" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ByLineStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="SideNote" type="SideNoteStructure"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="IntroductionStructure">
+		<xsd:sequence>
+			<xsd:element name="Title" type="TitleStructure"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:element name="Section" type="SectionStructure"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+			<xsd:element name="References" type="ReferencesStructure" minOccurs="0"/>
+			<xsd:element name="FurtherReading" type="ReferencesStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="LearningOutcomesStructure">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+			<xsd:element name="LearningOutcome" type="ParagraphStructure"/>
+			<xsd:element name="PageNumber" type="PageNumberStructure"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="SessionStructure">
+		<xsd:sequence>
+			<xsd:element name="Title" type="TitleStructure"/>
+			<xsd:element name="Introduction" type="IntroductionStructure" minOccurs="0"/>
+			<xsd:element name="LearningOutcomes" type="LearningOutcomesStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:element name="Section" type="SectionStructure"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+			<xsd:element name="Summary" type="SummaryStructure" minOccurs="0"/>
+			<xsd:element name="References" type="ReferencesStructure" minOccurs="0"/>
+			<xsd:element name="FurtherReading" type="ReferencesStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="TitleStructure" mixed="true">
+		<xsd:sequence>
+			<xsd:element name="Number" type="NumberStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="SideNote" type="SideNoteStructure"/>
+				<xsd:element name="AuthorComment" type="InlineStructure"/>
+				<xsd:element name="EditorComment" type="InlineStructure"/>
+				<xsd:group ref="SentenceElementsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="RestrictedTitleStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="HeadingStructure" mixed="true">
+		<xsd:sequence>
+			<xsd:element name="Number" type="NumberStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="SideNote" type="SideNoteStructure"/>
+				<xsd:element name="AuthorComment" type="InlineStructure"/>
+				<xsd:element name="EditorComment" type="InlineStructure"/>
+				<xsd:group ref="SentenceElementsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+		<xsd:attribute name="direction" default="" type="DirectionType"/>
+	</xsd:complexType>
+	<xsd:complexType name="TimingStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:sequence>
+				<xsd:element name="Hours" type="xsd:nonNegativeInteger" minOccurs="0"/>
+				<xsd:element name="Minutes" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:nonNegativeInteger">
+							<xsd:maxInclusive value="59"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+			<xsd:element name="AuthorComment" type="InlineStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="EditorComment" type="InlineStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="QADStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:group ref="StructuralObjectsGroup"/>
+			<xsd:group ref="SubHeadingsGroup"/>
+			<xsd:group ref="LearningObjectsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="BoxStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+			</xsd:choice>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+		<xsd:attribute name="type" type="BoxTypeType"/>
+	</xsd:complexType>
+	<xsd:complexType name="CaseStudyStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ExampleStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:element name="Answer" type="AnswerStructure"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+			</xsd:choice>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ExtractStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:element name="Introduction" type="IntroductionStructure" minOccurs="0"/>
+			<xsd:element name="ByLine" type="ByLineStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+			</xsd:choice>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+		<xsd:attribute name="class">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="Journal"/>
+					<xsd:enumeration value="Newspaper"/>
+					<xsd:enumeration value="Web"/>
+					<xsd:enumeration value="Fiction"/>
+					<xsd:enumeration value="Other"/>
+					<xsd:enumeration value=""/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="SubsidiaryListItemStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:restriction base="ListItemStructure">
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="SideNote" type="SideNoteStructure"/>
+					<xsd:element name="Paragraph" type="ParagraphStructure"/>
+					<xsd:element name="Equation" type="EquationStructure"/>
+					<xsd:element name="Chemistry" type="ChemistryStructure"/>
+					<xsd:element name="Figure" type="FigureStructure"/>
+					<xsd:group ref="SentenceElementsGroup"/>
+					<xsd:group ref="MixedContentGroup"/>
+					<xsd:element name="ComputerDisplay" type="ComputerDisplayStructure"/>
+					<xsd:element name="ProgramListing" type="ProgramListingStructure"/>
+					<xsd:element name="AuthorComment" type="InlineStructure"/>
+					<xsd:element name="EditorComment" type="InlineStructure"/>
+					<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+				</xsd:choice>
+				<xsd:attribute ref="xml:space" default="preserve"/>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ListItemStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="SideNote" type="SideNoteStructure"/>
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+			<xsd:element name="Equation" type="EquationStructure"/>
+			<xsd:element name="Chemistry" type="ChemistryStructure"/>
+			<xsd:element name="Figure" type="FigureStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+			<xsd:element name="ComputerDisplay" type="ComputerDisplayStructure"/>
+			<xsd:element name="ProgramListing" type="ProgramListingStructure"/>
+			<xsd:element name="BulletedSubsidiaryList" type="SubsidiaryListStructure"/>
+			<xsd:element name="NumberedSubsidiaryList" type="NumberedSubsidiaryListStructure"/>
+			<xsd:element name="UnNumberedSubsidiaryList" type="SubsidiaryListStructure"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="ListStructure">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="ListItem" type="ListItemStructure" maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attribute name="direction" default="" type="DirectionType"/>
+	</xsd:complexType>
+	<xsd:complexType name="SubsidiaryListStructure">
+		<xsd:sequence>
+			<xsd:element name="SubListItem" type="SubsidiaryListItemStructure" maxOccurs="unbounded"
+			/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="NumberedListStructure">
+		<xsd:complexContent>
+			<xsd:extension base="ListStructure">
+				<xsd:attribute name="class" type="NumberedListClassType" use="optional"
+					default="decimal"/>
+				<xsd:attribute name="start" type="xsd:positiveInteger" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NumberedSubsidiaryListStructure">
+		<xsd:complexContent>
+			<xsd:extension base="SubsidiaryListStructure">
+				<xsd:attribute name="class" type="NumberedListClassType" use="optional"
+					default="decimal"/>
+				<xsd:attribute name="start" type="xsd:positiveInteger" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ParagraphStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="SideNote" type="SideNoteStructure"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+			<xsd:element name="SecondVoice" type="InlineStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+		<xsd:attribute name="direction" default="" type="DirectionType"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="ParagraphWithoutSideNoteStructure" mixed="true">
+		<xsd:complexContent>
+			<xsd:restriction base="ParagraphStructure">
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="AuthorComment" type="InlineStructure"/>
+					<xsd:element name="EditorComment" type="InlineStructure"/>
+					<xsd:group ref="SentenceElementsGroup"/>
+					<xsd:group ref="MixedContentGroup"/>
+					<xsd:element name="SecondVoice" type="InlineStructure" minOccurs="0"
+						maxOccurs="unbounded"/>
+				</xsd:choice>
+				<xsd:attribute ref="xml:space" default="preserve"/>
+			</xsd:restriction>
+		</xsd:complexContent>
+
+	</xsd:complexType>
+
+	<xsd:complexType name="SideNoteParagraphStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="SideNoteStructure">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Heading" type="RestrictedTitleStructure"/>
+			<xsd:element name="SideNoteParagraph" type="SideNoteParagraphStructure"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="IconStructure" mixed="true">
+		<xsd:attribute name="resource1" type="ResourceAttributeType" default="none"/>
+		<xsd:attribute name="resource2" type="ResourceAttributeType" default="none"/>
+		<xsd:attribute name="resource3" type="ResourceAttributeType" default="none"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="ComputerCodeStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsWithoutComputerCodeAndComputerUIGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="ComputerUIStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsWithoutComputerCodeAndComputerUIGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="GlossaryTermStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="ReferencesStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Reference" type="ReferenceStructure"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ReferenceStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="SideNote" type="SideNoteStructure"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute name="id" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="src" type="xsd:string"/>
+		<xsd:attribute name="ReferenceID" type="xsd:string"/>
+		<xsd:attribute name="ReferenceStyle" type="ReferenceStyleType"/>
+		<xsd:attribute name="ManualOverride" type="xsd:boolean" default="true"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgementsStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Heading" type="HeadingStructure"/>
+			<xsd:element name="SubHeading" type="HeadingStructure"/>
+			<xsd:element name="SubSubHeading" type="HeadingStructure"/>
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="GlossaryStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="GlossaryItem" type="GlossaryItemStructure"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="GlossaryItemStructure">
+		<xsd:sequence>
+			<xsd:element name="Term" type="ParagraphWithoutSideNoteStructure"/>
+			<xsd:element name="Definition" type="ParagraphWithoutSideNoteStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AppendicesStructure">
+		<xsd:sequence>
+			<xsd:element name="Appendix" type="AppendixStructure" maxOccurs="unbounded"/>
+			<xsd:element name="References" type="ReferencesStructure" minOccurs="0"/>
+			<xsd:element name="FurtherReading" type="ReferencesStructure" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CourseTeamStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+			<xsd:element name="SubHeading" type="HeadingStructure"/>
+			<xsd:element name="SubSubHeading" type="HeadingStructure"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="SectionStructure">
+		<xsd:sequence>
+			<xsd:element name="Title" type="TitleStructure"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:element name="SubSection" type="SubSectionStructure"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+			<xsd:element name="Summary" type="SummaryStructure" minOccurs="0"/>
+			<xsd:element name="References" type="ReferencesStructure" minOccurs="0"/>
+			<xsd:element name="FurtherReading" type="ReferencesStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="SubSectionStructure">
+		<xsd:sequence>
+			<xsd:element name="Title" type="TitleStructure"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:element name="SubSubSection" type="SubSubSectionStructure"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+			<xsd:element name="Summary" type="SummaryStructure" minOccurs="0"/>
+			<xsd:element name="References" type="ReferencesStructure" minOccurs="0"/>
+			<xsd:element name="FurtherReading" type="ReferencesStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="SubSubSectionStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:element name="SubHeading" type="HeadingStructure"/>
+				<xsd:element name="SubSubHeading" type="HeadingStructure"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+			<xsd:element name="Summary" type="SummaryStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="SourceReferenceStructure" mixed="true">
+		<xsd:sequence>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="SideNote" type="SideNoteStructure"/>
+				<xsd:element name="AuthorComment" type="InlineStructure"/>
+				<xsd:element name="EditorComment" type="InlineStructure"/>
+				<xsd:group ref="SentenceElementsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="CaptionStructure" mixed="true">
+		<xsd:sequence>
+			<xsd:element name="Number" type="NumberStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="SideNote" type="SideNoteStructure"/>
+				<xsd:element name="AuthorComment" type="InlineStructure"/>
+				<xsd:element name="EditorComment" type="InlineStructure"/>
+				<xsd:group ref="SentenceElementsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+		<xsd:attribute name="position" type="CaptionPositionAttributeType" default="below"></xsd:attribute>
+	</xsd:complexType>
+	<xsd:simpleType name="CaptionPositionAttributeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="above"/>
+			<xsd:enumeration value="below"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="DescriptionStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="SideNote" type="SideNoteStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+			<xsd:group ref="StructuralObjectsGroup"/>
+		</xsd:choice>
+		<xsd:attribute name="DAISYIgnore" type="xsd:boolean"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="AlternativeStructure" mixed="true">
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="FigureStructure">
+		<xsd:complexContent>
+			<xsd:restriction base="EquationStructure">
+				<xsd:sequence>
+					<xsd:element name="Image" type="ImageStructure"/>
+					<xsd:element name="Caption" type="CaptionStructure" minOccurs="0"/>
+					<xsd:element name="Alternative" type="AlternativeStructure" minOccurs="0"/>
+					<xsd:element name="SourceReference" type="SourceReferenceStructure"
+						minOccurs="0"/>
+					<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EquationStructure">
+		<xsd:sequence>
+			<xsd:element name="TeX" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="MathML" type="MathMLStructure" minOccurs="0"/>
+			<xsd:element name="Image" type="ImageStructure" minOccurs="0"/>
+			<xsd:element name="Caption" type="CaptionStructure" minOccurs="0"/>
+			<xsd:element name="Alternative" type="AlternativeStructure" minOccurs="0"/>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+			<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+			<xsd:element name="Label" type="MixedContentStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="MathMLStructure">
+		<xsd:choice>
+			<xsd:element ref="mml:math"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="ChemistryStructure">
+		<xsd:complexContent>
+			<xsd:restriction base="EquationStructure">
+				<xsd:sequence>
+					<xsd:element name="Image" type="ImageStructure" minOccurs="0"/>
+					<xsd:element name="Caption" type="CaptionStructure" minOccurs="0"/>
+					<xsd:element name="Alternative" type="AlternativeStructure" minOccurs="0"/>
+					<xsd:element name="SourceReference" type="SourceReferenceStructure"
+						minOccurs="0"/>
+					<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+					<xsd:element name="Label" type="MixedContentStructure" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ImageStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute name="src" type="xsd:string"/>
+		<xsd:attribute name="src_uri" type="xsd:string"/>
+		<xsd:attribute name="alt" type="xsd:string"/>
+		<xsd:attribute name="longdesc" type="xsd:string"/>
+		<xsd:attribute name="height" type="xsd:string"/>
+		<xsd:attribute name="width" default="100%">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="100%"/>
+					<xsd:enumeration value="col_100"/>
+					<xsd:enumeration value="col_75"/>
+					<xsd:enumeration value="col_50"/>
+					<xsd:enumeration value="col_25"/>
+					<xsd:enumeration value="main_100"/>
+					<xsd:enumeration value="main_75"/>
+					<xsd:enumeration value="main_50"/>
+					<xsd:enumeration value="main_25"/>
+					<xsd:enumeration value="margin_100"/>
+					<xsd:enumeration value="margin_75"/>
+					<xsd:enumeration value="margin_50"/>
+					<xsd:enumeration value="margin_25"/>
+					<xsd:enumeration value=""/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="webthumbnail" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="eqn" type="xsd:string" use="optional"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="InlineImageStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="ImageStructure">
+				<xsd:attribute name="movedownby" type="xsd:integer"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TableStructure">
+		<xsd:sequence>
+			<xsd:element name="TableHead" type="TableHeadStructure"/>
+			<xsd:element name="tbody" type="TableGridStructure"/>
+			<xsd:element name="TableFootnote" type="TableFootnoteStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+			<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+		<xsd:attribute name="class" default="normal">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="normal"/>
+					<xsd:enumeration value="type 2"/>
+					<xsd:enumeration value="narrow"/>
+					<xsd:enumeration value="wide"/>
+					<xsd:enumeration value="accounts"/>
+					<xsd:enumeration value="landscape"/>
+					<xsd:enumeration value=""/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="style" default="topbottomrules">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="allrules"/>
+					<xsd:enumeration value="horizontalrules"/>
+					<xsd:enumeration value="topbottomrules"/>
+					<xsd:enumeration value="norules"/>
+					<xsd:enumeration value="chessboard"/>
+					<xsd:enumeration value="verticalrules"/>
+					<xsd:enumeration value="horizontalstripes"/>
+					<xsd:enumeration value="verticalstripes"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="TableHeadStructure" mixed="true">
+		<xsd:sequence>
+			<xsd:element name="Number" type="NumberStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="AuthorComment" type="InlineStructure"/>
+				<xsd:element name="EditorComment" type="InlineStructure"/>
+				<xsd:group ref="SentenceElementsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+		<xsd:attribute name="direction" default="" type="DirectionType"/>
+	</xsd:complexType>
+	<xsd:complexType name="TableFootnoteStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:element name="Quote" type="QuoteStructure"/>
+			</xsd:choice>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ProgramListingStructure">
+		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ComputerDisplayStructure">
+		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="VerseStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="Paragraph" type="ParagraphStructure"/>
+				<xsd:element name="SubHeading" type="HeadingStructure"/>
+				<xsd:element name="SubSubHeading" type="HeadingStructure"/>
+				<xsd:element name="AuthorComment" type="InlineStructure"/>
+				<xsd:element name="EditorComment" type="InlineStructure"/>
+				<xsd:element name="MultiColumnText" type="MultiColumnTextStructure"/>
+				<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="DialogueStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="Paragraph" type="ParagraphStructure"/>
+				<xsd:element name="Remark" type="ParagraphStructure"/>
+				<xsd:element name="Speaker" type="ParagraphStructure"/>
+				<xsd:element name="AuthorComment" type="InlineStructure"/>
+				<xsd:element name="EditorComment" type="InlineStructure"/>
+				<xsd:element name="MultiColumnText" type="MultiColumnTextStructure"/>
+				<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ReadingStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+			</xsd:choice>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="StudyNoteStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="KeyPointsStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="Paragraph" type="ParagraphStructure"/>
+				<xsd:element name="KeyPoint" type="ParagraphStructure"/>
+				<xsd:element name="BulletedList" type="ListStructure"/>
+				<xsd:element name="NumberedList" type="NumberedListStructure"/>
+				<xsd:element name="UnNumberedList" type="ListStructure"/>
+				<xsd:element name="Table" type="TableStructure"/>
+				<xsd:element name="Equation" type="EquationStructure"/>
+				<xsd:element name="Chemistry" type="ChemistryStructure"/>
+				<xsd:element name="Figure" type="FigureStructure"/>
+				<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="SummaryStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroup"/>
+				<xsd:group ref="SubHeadingsGroup"/>
+				<xsd:group ref="LearningObjectsGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:simpleType name="EditionType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ISBNType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:complexType name="PrintedStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FirstPublishedStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CopyrightStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="EditedStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TypesetStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RightsStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AddressStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="AddressLine" type="AddressLineStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AddressLineStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="MixedContentGroup"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="ImprintStructure" mixed="false">
+		<xsd:choice>
+			<xsd:element name="Standard" type="StandardStructure"/>
+			<xsd:element name="Copublished" type="CopublishedStructure"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="StandardStructure" mixed="false">
+		<xsd:sequence>
+			<xsd:element name="GeneralInfo" type="GeneralInfoStructure"/>
+			<xsd:element name="Address" type="AddressStructure"/>
+			<xsd:element name="FirstPublished" type="FirstPublishedStructure"/>
+			<xsd:element name="Copyright" type="CopyrightStructure"/>
+			<xsd:element name="Rights" type="RightsStructure"/>
+			<xsd:element name="Edited" type="EditedStructure"/>
+			<xsd:element name="Typeset" type="TypesetStructure" minOccurs="0"/>
+			<xsd:element name="Printed" type="PrintedStructure"/>
+			<xsd:element name="ISBN" type="MixedContentStructure"/>
+			<xsd:element name="Edition" type="MixedContentStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="GeneralInfoStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CopublishedStructure">
+		<xsd:sequence>
+			<xsd:element name="CopublisherAddress" type="AddressStructure"/>
+			<xsd:element name="Address" type="AddressStructure"/>
+			<xsd:element name="FirstPublished" type="FirstPublishedStructure"/>
+			<xsd:element name="Copyright" type="CopyrightStructure"/>
+			<xsd:element name="Rights" type="RightsStructure"/>
+			<xsd:element name="Edited" type="EditedStructure"/>
+			<xsd:element name="Typeset" type="TypesetStructure" minOccurs="0"/>
+			<xsd:element name="Printed" type="PrintedStructure"/>
+			<xsd:element name="OUCourseInfo" type="OUCourseInfoStructure" minOccurs="0"/>
+			<xsd:element name="OUWebAddress" type="OUWebAddressStructure" minOccurs="0"/>
+			<xsd:element name="BritishLibraryData" type="BritishLibraryDataStructure" minOccurs="0"/>
+			<xsd:element name="LibraryOfCongressData" type="LibraryOfCongressDataStructure"
+				minOccurs="0"/>
+			<xsd:element name="ISBN" type="MixedContentStructure"/>
+			<xsd:element name="Edition" type="MixedContentStructure"/>
+			<xsd:element name="Logo" type="FigureStructure" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="OUCourseInfoStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="OUWebAddressStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BritishLibraryDataStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LibraryOfCongressDataStructure" mixed="false">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PrefaceStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:group ref="StructuralObjectsGroup"/>
+			<xsd:element name="Heading" type="HeadingStructure"/>
+			<xsd:group ref="SubHeadingsGroup"/>
+			<xsd:element name="Box" type="BoxStructure"/>
+			<xsd:element name="CaseStudy" type="CaseStudyStructure"/>
+			<xsd:element name="ComputerDisplay" type="ComputerDisplayStructure"/>
+			<xsd:element name="Example" type="ExampleStructure"/>
+			<xsd:element name="Extract" type="ExtractStructure"/>
+			<xsd:element name="ProgramListing" type="ProgramListingStructure"/>
+			<xsd:element name="Quote" type="QuoteStructure"/>
+			<xsd:element name="Verse" type="VerseStructure"/>
+			<xsd:element name="MediaContent" type="MediaStructure"/>
+			<xsd:element name="InPageActivity" type="InPageStructure"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ConclusionStructure">
+		<xsd:sequence>
+			<xsd:element name="Title" type="TitleStructure"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:group ref="StructuralObjectsGroupNoPageNumber"/>
+				<xsd:element name="Section" type="SectionStructure"/>
+				<xsd:element name="Box" type="BoxStructure"/>
+				<xsd:element name="CaseStudy" type="CaseStudyStructure"/>
+				<xsd:element name="ComputerDisplay" type="ComputerDisplayStructure"/>
+				<xsd:element name="Example" type="ExampleStructure"/>
+				<xsd:element name="Extract" type="ExtractStructure"/>
+				<xsd:element name="ProgramListing" type="ProgramListingStructure"/>
+				<xsd:element name="Quote" type="QuoteStructure"/>
+				<xsd:element name="Verse" type="VerseStructure"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="HalfTitleVersoStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Heading" type="HeadingStructure"/>
+			<xsd:group ref="StructuralObjectsGroup"/>
+			<xsd:group ref="SubHeadingsGroup"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="AppendixStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:group ref="StructuralObjectsGroupNoPageNumber"/>
+			<xsd:element name="Section" type="SectionStructure"/>
+			<xsd:group ref="LearningObjectsGroup"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="InlineStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="TotalInlineStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="TotalMixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+
+	<xsd:group name="TotalMixedContentGroup">
+		<xsd:sequence>
+			<xsd:element name="b" type="TotalInlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="i" type="TotalInlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:simpleType name="URI">
+		<xsd:annotation>
+			<xsd:documentation> a Uniform Resource Identifier, see [RFC2396] </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:anyURI"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ContentType">
+		<xsd:annotation>
+			<xsd:documentation> media type, as per [RFC2045] </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:complexType name="InlineRestrictedEquationStructure">
+		<xsd:complexContent>
+			<xsd:restriction base="InlineEquationStructure">
+				<xsd:sequence>
+					<xsd:element name="Image" type="InlineImageStructure"/>
+					<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+					<xsd:element name="Alternative" type="AlternativeStructure" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InlineEquationStructure">
+		<xsd:sequence>
+			<xsd:element name="TeX" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="MathML" type="MathMLStructure" minOccurs="0"/>
+			<xsd:element name="Image" type="InlineImageStructure" minOccurs="0"/>
+			<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+			<xsd:element name="Alternative" type="AlternativeStructure" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MediaStructure">
+		<xsd:sequence>
+			<xsd:element name="Caption" type="CaptionStructure" minOccurs="0"/>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+			<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+			<xsd:element name="Transcript" type="DialogueStructure" minOccurs="0"/>
+			<xsd:element name="Parameters" type="ParametersStructure" minOccurs="0"/>
+			<xsd:element name="Attachments" type="AttachmentsStructure" minOccurs="0"/>
+			<xsd:element name="Figure" type="FigureStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="src" type="xsd:string"/>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+		<xsd:attribute name="type">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="audio"/>
+					<xsd:enumeration value="embed"/>
+					<xsd:enumeration value="file"/>
+					<xsd:enumeration value="html5"/>
+					<xsd:enumeration value="moodlequestion"/>
+					<xsd:enumeration value="oembed"/>
+					<xsd:enumeration value="openmark"/>
+					<xsd:enumeration value="video"/>
+					<xsd:enumeration value=""/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="width" type="xsd:string" use="optional"/>
+		<xsd:attribute name="height" type="xsd:string" use="optional"/>
+		<xsd:attribute name="webthumbnail" type="xsd:boolean" default="false"/>
+	</xsd:complexType>
+	<xsd:complexType name="InPageStructure">
+		<xsd:sequence>
+			<xsd:element name="Instructions" type="MixedContentStructure" minOccurs="0"/>
+			<xsd:element name="Parameters" type="ParametersStructure"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="type">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="discussion"/>
+					<xsd:enumeration value="questionnaire"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="TableGridStructure">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="tr" type="trType" maxOccurs="unbounded"/>
+			<xsd:group ref="SentenceElementsGroup"/>
+			<xsd:group ref="MixedContentGroup"/>
+			<xsd:group ref="TableStructuralObjectsGroup"/>
+		</xsd:choice>
+		<xsd:attribute name="class" default="TableGrid">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string"/>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="trType">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:sequence>
+				<xsd:element name="th" type="thStructure" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:sequence>
+				<xsd:element name="td" type="tdStructure" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="TableContentStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="1">
+			<xsd:choice minOccurs="0" maxOccurs="1">
+				<xsd:element name="FreeResponse" type="FreeResponseStructure"/>
+			</xsd:choice>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="SentenceElementsGroup"/>
+				<xsd:group ref="MixedContentGroup"/>
+				<xsd:group ref="TableStructuralObjectsGroup"/>
+			</xsd:choice>
+		</xsd:choice>
+		<xsd:attribute name="colspan" type="xsd:positiveInteger" use="optional"/>
+		<xsd:attribute name="rowspan" type="xsd:positiveInteger" use="optional"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+		<xsd:attribute name="borderleft" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="borderright" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="bordertop" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="borderbottom" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="highlight" use="optional" default="normal">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="normal"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="thStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="TableContentStructure">
+				<xsd:attribute name="class" default="ColumnHeadLeft">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="ColumnHeadLeft"/>
+							<xsd:enumeration value="ColumnHeadCentered"/>
+							<xsd:enumeration value="ColumnHeadRight"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="tdStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="TableContentStructure">
+				<xsd:attribute name="class" default="TableLeft">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="TableCentered"/>
+							<xsd:enumeration value="TableDecimal"/>
+							<xsd:enumeration value="TableLeft"/>
+							<xsd:enumeration value="TableRight"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="SentenceElementsGroup">
+		<xsd:sequence>
+			<xsd:element name="ComputerCode" type="ComputerCodeStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="CrossRef" type="CrossRefStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="GlossaryTerm" type="GlossaryTermStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="IndexTerm" type="IndexTermStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="InlineEquation" type="InlineEquationStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="InlineFigure" type="InlineRestrictedEquationStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="InlineChemistry" type="InlineRestrictedEquationStructure"
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="olink" type="olinkStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="InlinePageNumber" type="PageNumberStructure" minOccurs="0"/>
+			<xsd:element name="Icon" type="IconStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ComputerUI" type="ComputerUIStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="SentenceElementsWithoutComputerCodeAndComputerUIGroup">
+		<xsd:sequence>
+			<xsd:element name="CrossRef" type="CrossRefStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="GlossaryTerm" type="GlossaryTermStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="IndexTerm" type="IndexTermStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="InlineEquation" type="InlineEquationStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="InlineFigure" type="InlineRestrictedEquationStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="InlineChemistry" type="InlineRestrictedEquationStructure"
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="olink" type="olinkStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="InlinePageNumber" type="PageNumberStructure" minOccurs="0"/>
+			<xsd:element name="Icon" type="IconStructure" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="MixedContentGroup">
+		<xsd:sequence>
+			<xsd:element name="b" type="InlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="i" type="InlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="u" type="InlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="sup" type="InlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="sub" type="InlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="smallCaps" type="InlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="a" type="aStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="font" type="FontStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="footnote" type="FootnoteStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="language" type="languageStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="br" type="BrStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="sym" type="SymStructure" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="languageStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="InlineStructure">
+				<xsd:attribute name="auto" type="xsd:string"/>
+				<!-- <xsd:attribute name="val" type="LanguageType"/>
+				<xsd:attribute name="lang" type="LanguageType"/> -->
+				<xsd:attribute ref="xml:lang"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="IndexTermStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="InlineStructure">
+				<xsd:attribute name="name" type="xsd:string"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="aStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="InlineStructure">
+				<xsd:attribute name="href" type="URI"/>
+				<xsd:attribute name="name" type="xsd:NMTOKEN"/>
+				<xsd:attribute name="type" type="ContentType"/>
+				<xsd:attribute name="target" type="ContentType"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SymStructure" mixed="true">
+		<xsd:attribute name="font" type="xsd:string"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="BrStructure" mixed="false"/>
+	<xsd:complexType name="FontStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="InlineStructure">
+				<xsd:attribute name="val" type="FontType"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LearningObjectsGroup">
+		<xsd:choice>
+			<xsd:element name="Activity" type="ActivityStructure"/>
+			<xsd:element name="Box" type="BoxStructure"/>
+			<xsd:element name="CaseStudy" type="CaseStudyStructure"/>
+			<xsd:element name="ComputerDisplay" type="ComputerDisplayStructure"/>
+			<xsd:element name="Dialogue" type="DialogueStructure"/>
+			<xsd:element name="Example" type="ExampleStructure"/>
+			<xsd:element name="Exercise" type="ActivityStructure"/>
+			<xsd:element name="Extract" type="ExtractStructure"/>
+			<xsd:element name="ITQ" type="ActivityWithoutDiscussionStructure"/>
+			<xsd:element name="ProgramListing" type="ProgramListingStructure"/>
+			<xsd:element name="Quote" type="QuoteStructure"/>
+			<xsd:element name="Reading" type="ReadingStructure"/>
+			<xsd:element name="SAQ" type="ActivityStructure"/>
+			<xsd:element name="StudyNote" type="StudyNoteStructure"/>
+			<xsd:element name="Verse" type="VerseStructure"/>
+			<xsd:element name="MediaContent" type="MediaStructure"/>
+			<xsd:element name="InPageActivity" type="InPageStructure"/>
+			<xsd:element name="InternalSection" type="SubSubSectionStructure"/>
+			<xsd:element name="Proof" type="BoxStructure"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="ReducedLearningObjectsGroup">
+		<xsd:choice>
+			<xsd:element name="Box" type="BoxStructure"/>
+			<xsd:element name="ComputerDisplay" type="ComputerDisplayStructure"/>
+			<xsd:element name="Dialogue" type="DialogueStructure"/>
+			<xsd:element name="Example" type="ExampleStructure"/>
+			<xsd:element name="Extract" type="ExtractStructure"/>
+			<xsd:element name="ProgramListing" type="ProgramListingStructure"/>
+			<xsd:element name="Quote" type="QuoteStructure"/>
+			<xsd:element name="Reading" type="ReadingStructure"/>
+			<xsd:element name="StudyNote" type="StudyNoteStructure"/>
+			<xsd:element name="Verse" type="VerseStructure"/>
+			<xsd:element name="MediaContent" type="MediaStructure"/>
+			<xsd:element name="InPageActivity" type="InPageStructure"/>
+			<xsd:element name="InternalSection" type="SubSubSectionStructure"/>
+			<xsd:element name="Proof" type="BoxStructure"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="StructuralObjectsGroup">
+		<xsd:choice>
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+			<xsd:element name="BulletedList" type="ListStructure"/>
+			<xsd:element name="NumberedList" type="NumberedListStructure"/>
+			<xsd:element name="UnNumberedList" type="ListStructure"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:element name="Chemistry" type="ChemistryStructure"/>
+			<xsd:element name="Figure" type="FigureStructure"/>
+			<xsd:element name="Table" type="TableStructure"/>
+			<xsd:element name="Equation" type="EquationStructure"/>
+			<xsd:element name="KeyPoints" type="KeyPointsStructure"/>
+			<xsd:element name="MultiColumnText" type="MultiColumnTextStructure"/>
+			<xsd:element name="PageNumber" type="PageNumberStructure"/>
+			<xsd:element name="Reference" type="ReferenceStructure"/>
+			<xsd:element name="FreeResponseDisplay" type="FreeResponseDisplayStructure"/>
+			<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="TableStructuralObjectsGroup">
+		<xsd:choice>
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+			<xsd:element name="BulletedList" type="ListStructure"/>
+			<xsd:element name="NumberedList" type="NumberedListStructure"/>
+			<xsd:element name="UnNumberedList" type="ListStructure"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:element name="Chemistry" type="ChemistryStructure"/>
+			<xsd:element name="Figure" type="FigureStructure"/>
+			<xsd:element name="Equation" type="EquationStructure"/>
+			<xsd:element name="SideNote" type="SideNoteStructure"/>
+			<xsd:element name="PageNumber" type="PageNumberStructure"/>
+			<xsd:element name="Total" type="TotalStructure"/>
+			<xsd:element name="Reference" type="ReferenceStructure"/>
+			<xsd:element name="FreeResponseDisplay" type="FreeResponseDisplayStructure"/>
+			<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="StructuralObjectsGroupNoPageNumber">
+		<xsd:choice>
+			<xsd:element name="Paragraph" type="ParagraphStructure"/>
+			<xsd:element name="BulletedList" type="ListStructure"/>
+			<xsd:element name="NumberedList" type="NumberedListStructure"/>
+			<xsd:element name="UnNumberedList" type="ListStructure"/>
+			<xsd:element name="AuthorComment" type="InlineStructure"/>
+			<xsd:element name="EditorComment" type="InlineStructure"/>
+			<xsd:element name="Chemistry" type="ChemistryStructure"/>
+			<xsd:element name="Figure" type="FigureStructure"/>
+			<xsd:element name="Table" type="TableStructure"/>
+			<xsd:element name="Equation" type="EquationStructure"/>
+			<xsd:element name="KeyPoints" type="KeyPointsStructure"/>
+			<xsd:element name="MultiColumnText" type="MultiColumnTextStructure"/>
+			<xsd:element name="Reference" type="ReferenceStructure"/>
+			<xsd:element name="FreeResponseDisplay" type="FreeResponseDisplayStructure"/>
+			<xsd:element name="RevealMore" type="ParagraphWithoutSideNoteStructure"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="SubHeadingsGroup">
+		<xsd:choice>
+			<xsd:element name="SubHeading" type="HeadingStructure"/>
+			<xsd:element name="SubSubHeading" type="HeadingStructure"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:complexType name="ItemRightsStructure">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="OwnerRef" type="MixedContentStructure"/>
+			<xsd:element name="ItemRef" type="MixedContentStructure"/>
+			<xsd:element name="ItemAcknowledgement" type="ParagraphStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CrossRefStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="InlineStructure">
+				<xsd:attribute name="idref" type="xsd:IDREF" use="required"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="olinkStructure" mixed="true">
+		<xsd:complexContent mixed="true">
+			<xsd:extension base="InlineStructure">
+				<xsd:attribute name="targetdoc" type="xsd:string"/>
+				<xsd:attribute name="targetptr" type="xsd:string"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:attributeGroup name="LearningObjectsAttributesGroup">
+		<xsd:attribute name="id" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="resource1" type="ResourceAttributeType" default="none"/>
+		<xsd:attribute name="resource2" type="ResourceAttributeType" default="none"/>
+		<xsd:attribute name="resource3" type="ResourceAttributeType" default="none"/>
+		<!--<xsd:attribute name="if" type="ConditionList"/>
+		<xsd:attribute name="not" type="ConditionList"/>-->
+	</xsd:attributeGroup>
+	<xsd:attributeGroup name="StructuralObjectsAttributesGroup">
+		<xsd:attribute name="id" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="position" type="PositionAttributeType" use="optional"
+			default="floating"/>
+		<!--<xsd:attribute name="if" type="ConditionList"/>
+		<xsd:attribute name="not" type="ConditionList"/>-->
+	</xsd:attributeGroup>
+	<xsd:simpleType name="PositionAttributeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="fixed"/>
+			<xsd:enumeration value="widefixed"/>
+			<xsd:enumeration value="floating"/>
+			<xsd:enumeration value="rightalign"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ParametersStructure">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="Parameter" type="ParameterStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AttachmentsStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Attachment" type="AttachmentStructure" minOccurs="0"/>
+			<xsd:element name="Folder" type="AttachmentStructure" minOccurs="0"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="ParameterStructure">
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="value" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AttachmentStructure">
+		<xsd:attribute name="src" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:simpleType name="ResourceAttributeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="3d"/>
+			<!--deprecated-->
+			<xsd:enumeration value="accessibilityinfo">
+				<xsd:annotation>
+					<xsd:documentation>deprecated - use accessibility</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="accessibility"/>
+			<xsd:enumeration value="address"/>
+			<xsd:enumeration value="assessment"/>
+			<!--deprecated-->
+			<xsd:enumeration value="assessmentguide">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="audio"/>
+			<xsd:enumeration value="audio_recording"/>
+			<xsd:enumeration value="blog"/>
+			<!--deprecated-->
+			<xsd:enumeration value="book">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="calculator"/>
+			<xsd:enumeration value="calendar"/>
+			<!--deprecated-->
+			<xsd:enumeration value="card">
+				<xsd:annotation>
+					<xsd:documentation>deprecated - use activity</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="activity"/>
+			<!--deprecated-->
+			<xsd:enumeration value="cd">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="chat"/>
+			<xsd:enumeration value="cloud_based"/>
+			<!--deprecated-->
+			<xsd:enumeration value="computer">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="conference">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="course">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="courseguide">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="database"/>
+			<xsd:enumeration value="disc"/>
+			<xsd:enumeration value="download"/>
+			<xsd:enumeration value="draft_post"/>
+			<!--deprecated-->
+			<xsd:enumeration value="dvd">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="email">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="enquiryform">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="external_link"/>
+			<xsd:enumeration value="favourite"/>
+			<!--deprecated-->
+			<xsd:enumeration value="fax">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="forum"/>
+			<xsd:enumeration value="glossary"/>
+			<xsd:enumeration value="guide"/>
+			<xsd:enumeration value="help"/>
+			<!--deprecated-->
+			<xsd:enumeration value="ict">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="information"/>
+			<!--deprecated-->
+			<xsd:enumeration value="inperson">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="instantmessaging">
+				<xsd:annotation>
+					<xsd:documentation>deprecated - use instant_messaging</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="instant_messaging"/>
+			<xsd:enumeration value="internal_link"/>
+			<!--deprecated-->
+			<xsd:enumeration value="learningjournal">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="longactivity">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="mediumactivity">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="musicdvd">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="mystuff">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="none"/>
+			<!--deprecated-->
+			<xsd:enumeration value="notes">
+				<xsd:annotation>
+					<xsd:documentation>deprecated - use note</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="note"/>
+			<!--deprecated-->
+			<xsd:enumeration value="offlineactivity">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="offprint">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="online"/>
+			<!--deprecated-->
+			<xsd:enumeration value="onlineactivity">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="onlinecomputer">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="onlineglossary">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="open_studio"/>
+			<xsd:enumeration value="phone"/>
+			<xsd:enumeration value="podcast"/>
+			<xsd:enumeration value="portfolio"/>
+			<xsd:enumeration value="post"/>
+			<!--deprecated-->
+			<xsd:enumeration value="practical activity">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="questionnaire"/>
+			<xsd:enumeration value="reader"/>
+			<xsd:enumeration value="reading_matter"/>
+			<xsd:enumeration value="reflection"/>
+			<!--deprecated-->
+			<xsd:enumeration value="researchmethods">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="resource"/>
+			<xsd:enumeration value="settings"/>
+			<!--deprecated-->
+			<xsd:enumeration value="shortactivity">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="skills"/>
+			<!--deprecated-->
+			<xsd:enumeration value="study">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="studyguide">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="timer">
+				<xsd:annotation>
+					<xsd:documentation>deprecated - use timed</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="timed"/>
+			<xsd:enumeration value="upload"/>
+			<!--deprecated-->
+			<xsd:enumeration value="video">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="videodvd">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="wallchart">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="web">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="webchat">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<!--deprecated-->
+			<xsd:enumeration value="weblink">
+				<xsd:annotation>
+					<xsd:documentation>deprecated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="wiki"/>
+			<xsd:enumeration value="quiz"/>
+			<xsd:enumeration value="workshop"/>
+			<xsd:enumeration value="studentquiz"/>
+			<xsd:enumeration value=""/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BoxTypeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="style1"/>
+			<xsd:enumeration value="style2"/>
+			<xsd:enumeration value="style3"/>
+			<xsd:enumeration value="style4"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="NumberedListClassType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="decimal"/>
+			<xsd:enumeration value="lower-roman"/>
+			<xsd:enumeration value="upper-roman"/>
+			<xsd:enumeration value="lower-alpha"/>
+			<xsd:enumeration value="upper-alpha"/>
+			<xsd:enumeration value=""/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="InteractionStructure">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="SingleChoice" type="InteractionSingleChoiceStructure"/>
+			<xsd:element name="Matching" type="InteractionMatchingStructure"/>
+			<xsd:element name="FreeResponse" type="FreeResponseStructure"/>
+			<xsd:element name="VoiceRecorder" type="VoiceRecorderStructure"/>
+			<xsd:element name="MultipleChoice" type="InteractionMultipleChoiceStructure"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="VoiceRecorderStructure">
+		<xsd:all>
+			<xsd:element name="Listen" type="VoiceRecorderPartStructure" minOccurs="0"/>
+			<xsd:element name="Record" type="VoiceRecorderPartStructure" minOccurs="0"/>
+			<xsd:element name="Model" type="VoiceRecorderPartStructure" minOccurs="0"/>
+		</xsd:all>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+		<xsd:attribute name="group" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="VoiceRecorderPartStructure">
+		<xsd:sequence>
+			<xsd:element name="Transcript" type="DialogueStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="src" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="FreeResponseStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="lang" type="LanguageType"/>
+		<xsd:attribute name="size" type="FreeResponseSizeType" use="required"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+
+	</xsd:complexType>
+	<xsd:simpleType name="FreeResponseSizeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="single line"/>
+			<xsd:enumeration value="paragraph"/>
+			<xsd:enumeration value="long"/>
+			<xsd:enumeration value="formatted"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- this is not ideal as it doesn't make them put at least one Wrong answer in -->
+	<!-- the order on the vle is the same as the order in the document -->
+	<!-- so what else can I do? -->
+	<xsd:complexType name="InteractionSingleChoiceStructure">
+		<xsd:sequence>
+			<xsd:element name="Wrong" type="SingleChoiceInteractionStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="Right" type="SingleChoiceInteractionStructure"/>
+			<xsd:element name="Wrong" type="SingleChoiceInteractionStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="InteractionMultipleChoiceStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Right" type="SingleChoiceInteractionStructure"/>
+			<xsd:element name="Wrong" type="SingleChoiceInteractionStructure"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="InteractionMatchingStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:sequence>
+				<xsd:element name="Option" type="MatchingInteractionStructure"/>
+				<xsd:element name="Match" type="MatchingInteractionStructure"/>
+			</xsd:sequence>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="SingleChoiceInteractionStructure">
+		<xsd:sequence>
+			<xsd:element name="Paragraph" type="ParagraphStructure" maxOccurs="unbounded"/>
+			<xsd:element name="Feedback" type="InteractionOptionFeedbackStructure" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MatchingInteractionStructure">
+		<xsd:sequence>
+			<xsd:element name="Paragraph" type="ParagraphStructure" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="InteractionOptionFeedbackStructure">
+		<xsd:sequence>
+			<xsd:element name="Paragraph" type="ParagraphStructure" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ActivityStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:element name="Timing" type="TimingStructure" minOccurs="0"/>
+			<xsd:choice>
+				<xsd:sequence>
+					<xsd:element name="Question" type="QADStructure"/>
+					<xsd:element name="MediaContent" type="MediaStructure" minOccurs="0"/>
+					<xsd:element name="InPageActivity" type="InPageStructure" minOccurs="0"/>
+					<xsd:element name="Interaction" type="InteractionStructure" minOccurs="0"/>
+					<xsd:element name="Answer" type="AnswerStructure" minOccurs="0"/>
+					<xsd:element name="Discussion" type="DiscussionStructure" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="Multipart" type="MultiPartActivityStructure"/>
+				</xsd:sequence>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ActivityWithoutDiscussionStructure">
+		<xsd:complexContent>
+			<xsd:restriction base="ActivityStructure">
+				<xsd:sequence>
+					<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+					<xsd:element name="Timing" type="TimingStructure" minOccurs="0"/>
+					<xsd:choice>
+						<xsd:sequence>
+							<xsd:element name="Question" type="QADStructure"/>
+							<xsd:element name="MediaContent" type="MediaStructure" minOccurs="0"/>
+							<xsd:element name="InPageActivity" type="InPageStructure" minOccurs="0"/>
+							<xsd:element name="Interaction" type="InteractionStructure"
+								minOccurs="0"/>
+							<xsd:element name="Answer" type="AnswerStructure" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="Multipart" type="MultiPartActivityStructure"/>
+						</xsd:sequence>
+					</xsd:choice>
+				</xsd:sequence>
+				<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MultiPartActivityStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Part" type="ActivityPartStructure"/>
+			<xsd:group ref="StructuralObjectsGroup"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="ActivityPartStructure">
+		<xsd:sequence>
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:element name="Timing" type="TimingStructure" minOccurs="0"/>
+			<xsd:element name="Question" type="QADStructure"/>
+			<xsd:element name="MediaContent" type="MediaStructure" minOccurs="0"/>
+			<xsd:element name="InPageActivity" type="InPageStructure" minOccurs="0"/>
+			<xsd:element name="Interaction" type="InteractionStructure" minOccurs="0"/>
+			<xsd:element name="Answer" type="AnswerStructure" minOccurs="0"/>
+			<xsd:element name="Discussion" type="DiscussionStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="LearningObjectsAttributesGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="IndexStructure">
+		<xsd:sequence>
+			<xsd:element name="Title" type="TitleStructure"/>
+			<xsd:element name="Paragraph" type="ParagraphStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="Index1" type="InlineStructure" minOccurs="0"
+					maxOccurs="unbounded"/>
+				<xsd:element name="Index2" type="InlineStructure" minOccurs="0"
+					maxOccurs="unbounded"/>
+				<xsd:element name="Index3" type="InlineStructure" minOccurs="0"
+					maxOccurs="unbounded"/>
+				<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"
+					maxOccurs="unbounded"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PageNumberStructure" mixed="false">
+		<xsd:attribute name="number" type="xsd:string" use="required"/>
+		<xsd:attribute name="isblank" type="xsd:boolean"/>
+	</xsd:complexType>
+	<xsd:simpleType name="ReferenceStyleType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="OU Harvard"/>
+			<xsd:enumeration value="Open University (Faculty of Health &amp; Social Care)"/>
+			<xsd:enumeration value="MHRA"/>
+			<xsd:enumeration value="MLA"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="TOCstructure" mixed="false">
+		<xsd:sequence minOccurs="0">
+			<xsd:element name="Heading" type="HeadingStructure" minOccurs="0"/>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="TOC1" type="TOCitemStructure"/>
+				<xsd:element name="TOC2" type="TOCitemStructure"/>
+				<xsd:element name="TOC3" type="TOCitemStructure"/>
+				<xsd:group ref="MixedContentGroup"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TOCitemStructure" mixed="false">
+		<xsd:sequence>
+			<xsd:element name="EntryNumber" type="MixedContentStructure"/>
+			<xsd:element name="EntryLabel" type="HeadingStructure"/>
+			<xsd:element name="PageNumber" type="MixedContentStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="NumberStructure" mixed="true">
+		<xsd:attribute name="suppressprefix" type="xsd:boolean" use="optional" default="true"/>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="MixedContentStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="MixedContentGroup"/>
+		</xsd:choice>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="MultiColumnTextStructure">
+		<xsd:sequence>
+			<xsd:element name="MultiColumnHead" type="TableHeadStructure" minOccurs="0"/>
+			<xsd:element name="MultiColumnBody" type="MultiColumnBodyStructure"/>
+			<xsd:element name="MultiColumnFootnote" type="TableFootnoteStructure" minOccurs="0"
+				maxOccurs="unbounded"/>
+			<xsd:element name="SourceReference" type="SourceReferenceStructure" minOccurs="0"/>
+			<xsd:element name="Description" type="DescriptionStructure" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="StructuralObjectsAttributesGroup"/>
+		<xsd:attribute name="style" default="topbottomrules">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="allrules"/>
+					<xsd:enumeration value="horizontalrules"/>
+					<xsd:enumeration value="topbottomrules"/>
+					<xsd:enumeration value="norules"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="type">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="narrowfirst"/>
+					<xsd:enumeration value="narrowlast"/>
+					<xsd:enumeration value="equal"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="headingrow">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="show"/>
+					<xsd:enumeration value="hide"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="MultiColumnBodyStructure">
+		<xsd:sequence>
+			<xsd:element name="Table" type="MultiColumnBodyTableStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MultiColumnBodyTableStructure">
+		<xsd:sequence>
+			<xsd:element name="tbody" type="TableGridStructure"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TotalStructure" mixed="true">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="b" type="TotalInlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="i" type="TotalInlineStructure" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attribute name="line" use="optional" default="single">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="single"/>
+					<xsd:enumeration value="double"/>
+					<xsd:enumeration value="none"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="lineposition" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="below"/>
+					<xsd:enumeration value="none"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute ref="xml:space" default="preserve"/>
+	</xsd:complexType>
+	<xsd:complexType name="CoversStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="Cover" type="CoverStructure"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="CoverStructure">
+		<xsd:attribute name="type" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="ebook"/>
+					<xsd:enumeration value="audiobook"/>
+					<xsd:enumeration value="A4"/>
+					<xsd:enumeration value="CrownQuarto"/>
+					<xsd:enumeration value="ReducedA4"/>
+					<xsd:enumeration value="HTMLPackage"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="src" type="xsd:string"/>
+		<xsd:attribute name="template" type="xsd:boolean"/>
+	</xsd:complexType>
+	<xsd:complexType name="PromotionStructure">
+		<xsd:attribute name="url" type="xsd:string"/>
+		<xsd:attribute name="code" type="xsd:string"/>
+		<xsd:attribute name="label" type="xsd:string"/>
+		<xsd:attribute name="src" type="xsd:string"/>
+		<xsd:attribute name="alternative" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:simpleType name="FontListType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Arial"/>
+			<xsd:enumeration value="Arial Unicode MS"/>
+			<xsd:enumeration value="Courier"/>
+			<xsd:enumeration value="Futura"/>
+			<xsd:enumeration value="Garamond"/>
+			<xsd:enumeration value="Helvetica"/>
+			<xsd:enumeration value="Helvetica Condensed"/>
+			<xsd:enumeration value="MGill"/>
+			<xsd:enumeration value="Newbaskerville"/>
+			<xsd:enumeration value="OUmusic"/>
+			<xsd:enumeration value="Palatino"/>
+			<xsd:enumeration value="TechPhonetic2"/>
+			<xsd:enumeration value="Times New Roman"/>
+			<xsd:enumeration value="Verdana"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FontStringType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="FontType">
+		<xsd:union memberTypes="FontListType FontStringType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LanguageListType">
+		<xsd:restriction base="xsd:language">
+			<xsd:enumeration value="cy"/>
+			<xsd:enumeration value="de"/>
+			<xsd:enumeration value="en-GB"/>
+			<xsd:enumeration value="en-US"/>
+			<xsd:enumeration value="es"/>
+			<xsd:enumeration value="fr"/>
+			<xsd:enumeration value="it"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LanguageLanguageType">
+		<xsd:restriction base="xsd:language"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LanguageType">
+		<xsd:union memberTypes="LanguageListType LanguageLanguageType"/>
+	</xsd:simpleType>
+	<xsd:complexType name="metaStructure">
+		<xsd:attribute name="http-equiv" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="name" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="content" type="xsd:string" use="required"/>
+		<xsd:attribute name="scheme" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="FootnoteStructure">
+		<xsd:complexContent>
+			<xsd:extension base="InlineStructure">
+				<xsd:attribute name="start" type="xsd:positiveInteger" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AnswerStructure">
+		<xsd:complexContent>
+			<xsd:extension base="QADStructure">
+				<xsd:attribute name="type" type="AnswerTypeType" use="optional" default="Answer"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="AnswerTypeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Answer"/>
+			<xsd:enumeration value="Specimen answer"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="DiscussionStructure">
+		<xsd:complexContent>
+			<xsd:extension base="QADStructure">
+				<xsd:attribute name="type" type="DiscussionAliasType" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="FreeResponseDisplayStructure">
+		<xsd:attribute name="idref" type="xsd:IDREF"/>
+		<xsd:attribute name="targetdoc" type="xsd:string"/>
+		<xsd:attribute name="targetidref" type="xsd:string"/>
+	</xsd:complexType>
+
+	<xsd:simpleType name="DirectionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value=""/>
+			<xsd:enumeration value="rtl"/>
+			<xsd:enumeration value="ltr"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<!--<xsd:simpleType name="ConditionList">
+		<xsd:list itemType="ConditionType"></xsd:list>
+	</xsd:simpleType>
+	<xsd:simpleType name="ConditionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="vle"/>
+			<xsd:enumeration value="pdf"/>
+			<xsd:enumeration value="alt"/>
+		</xsd:restriction>
+	</xsd:simpleType>-->
+</xsd:schema>
