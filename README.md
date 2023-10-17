@@ -33,3 +33,14 @@ Options:
   -s, --schema TEXT  XML schema filepath
   --help             Show this message and exit.
 ```
+
+To transform a single OU-XML file to markdown:
+
+`ou_xml_validator transform path-to-file/content.xml`
+
+To transform markdown files described by `_toc.yml` and configured using `_config.yml` to OU-XML;
+
+```bash
+jb build . --builder custom --custom-builder xml
+ouseful_obt .
+```
