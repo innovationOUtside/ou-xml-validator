@@ -1,6 +1,5 @@
 # ou-xml-validator
 
-
 Command-line tools for transforming and validating OU-XML. Tools include:
 
 - generating Markdown/MyST Markdown from OU-XML
@@ -20,6 +19,16 @@ or
 An XSLT based transformation for transforming a single OU-XML file to one or more markdown files. *A post-processor script then cleans and formats the generated markdown.*
 
 `ou_xml_validator transform path-to-file/content.xml`
+
+We can clean the markdown as follows:
+
+```bash
+# pip3 install mdformat mdformat-myst
+mdformat src 
+ou_xml_validator cleanmd PATH
+# If it's simple markdown, transform to myst
+jupytext --to myst src/*.md
+```
 
 ## Transforming Markdown/Must Markdown to OU-XML
 

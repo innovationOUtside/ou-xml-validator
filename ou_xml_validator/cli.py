@@ -1,6 +1,7 @@
 import click
 from .xml_validator import validate_xml
 from .xml_xslt import transform_xml2md
+from .md_tools import clean_md
 
 @click.group()
 def cli():
@@ -20,3 +21,9 @@ def validate(path, schema):
 def transform(xml, xslt, output_path_stub):
 	"""Transform OU-XML document using XSLT."""
 	transform_xml2md(xml, xslt, output_path_stub)
+
+@cli.command()
+@click.argument('path', default='.', type=click.Path(exists=True))
+def cleanmd(path):
+    """Clean markdown files."""
+    clean_md(path)
