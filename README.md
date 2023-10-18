@@ -1,6 +1,11 @@
 # ou-xml-validator
 
-Simple tool to validate OU-XML files.
+
+Command-line tools for transforming and validating OU-XML. Tools include:
+
+- generating Markdown/MyST Markdown from OU-XML
+- genrating OU-XML from Markdown/MyST Markdown
+- validating OU-XML
 
 Install as:
 
@@ -9,6 +14,28 @@ Install as:
 or
 
 `pip install git+https://github.com/innovationOUtside/ou-xml-validator.git`
+
+## Transforming OU-XML to Markdown/MyST
+
+An XSLT based transformation for transforming a single OU-XML file to one or more markdown files. *A post-processor script then cleans and formats the generated markdown.*
+
+`ou_xml_validator transform path-to-file/content.xml`
+
+## Transforming Markdown/Must Markdown to OU-XML
+
+Extending a tool originally developed by Mark Hall, transform Sphinx XML generated from markdown files described by `_toc.yml` and configured using `_config.yml`to OU-XML. Admonition extensions in the original markdown can be trasnformed using the [`innovationOUtside/sphinxcontrib-ou-xml-tags`](https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags) Sphinx plugin.
+
+```bash
+# Use Jupyter Book tools to generate Sphinx XML
+jb build . --builder custom --custom-builder xml
+# Transform Sphinx XML to OU-XML
+ouseful_obt .
+# The resulting XML should be checked using the OU-XML validator.
+```
+
+## OU-XML Validator
+
+Simple tool to validate OU-XML files.
 
 To validate a single file:
 
@@ -32,15 +59,4 @@ Usage: ou_xml_validator validate [OPTIONS] [PATH]
 Options:
   -s, --schema TEXT  XML schema filepath
   --help             Show this message and exit.
-```
-
-To transform a single OU-XML file to markdown:
-
-`ou_xml_validator transform path-to-file/content.xml`
-
-To transform markdown files described by `_toc.yml` and configured using `_config.yml` to OU-XML;
-
-```bash
-jb build . --builder custom --custom-builder xml
-ouseful_obt .
 ```
