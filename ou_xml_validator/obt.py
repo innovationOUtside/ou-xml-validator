@@ -210,6 +210,7 @@ def apply_fixes(
         if path.exists(image_src):
             filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}.png'
             filepath = path.join(source, "_build", "ouxml", filename)
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
             copy(image_src, filepath)
             node.attrib["src"] = urljoin(image_path_prefix, filename)
     elif node.tag == "MediaContent":
@@ -217,10 +218,11 @@ def apply_fixes(
             media_src = path.join(source, node.attrib["src"])
             filename = node.attrib["src"]
             if path.exists(media_src):
-                #filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}.png'
+                filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_media_{os.path.basename(filename)}'
                 # TO DO - better naminmg convention
                 # TO DO - Needs a corresponding counter?
                 filepath = path.join(source, "_build", "ouxml", filename)
+                os.makedirs(os.path.dirname(filepath), exist_ok=True)
                 copy(media_src, filepath)
             else:
                  stdout(f"can't find {media_src}")
