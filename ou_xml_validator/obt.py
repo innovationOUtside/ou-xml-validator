@@ -55,6 +55,7 @@ def apply_fixes(
     counters: dict,
     part_title: str,
     image_path_prefix: str,
+    audio_path_prefix: str,
     toc: dict,
     item_title: str,
     use_caption_as_title: bool,  # noqa: FBT001
@@ -211,6 +212,20 @@ def apply_fixes(
             filepath = path.join(source, "_build", "ouxml", filename)
             copy(image_src, filepath)
             node.attrib["src"] = urljoin(image_path_prefix, filename)
+    elif node.tag == "MediaContent":
+        if "src" in node.attrib:
+            media_src = path.join(source, node.attrib["src"])
+            filename = node.attrib["src"]
+            if path.exists(media_src):
+                #filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}.png'
+                # TO DO - better naminmg convention
+                # TO DO - Needs a corresponding counter?
+                filepath = path.join(source, "_build", "ouxml", filename)
+                copy(media_src, filepath)
+            else:
+                 stdout(f"can't find {media_src}")
+            if node.attrib["type"]=="audio":
+                node.attrib["src"] = urljoin(audio_path_prefix, filename)
     elif node.tag == "Activity":
         # Wrap the activity content in a Question
         question = None
@@ -253,6 +268,7 @@ def apply_fixes(
             counters,
             part_title,
             image_path_prefix,
+            audio_path_prefix,
             toc,
             item_title,
             use_caption_as_title,
@@ -420,6 +436,27 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
     </xsl:template>
     <xsl:template match="container[@design_component = 'ou-activity-answer']">
         <Answer><xsl:apply-templates/></Answer>
+    </xsl:template>
+
+    <!-- sphinx-contrig.ou-xml-tags -->
+    <xsl:template match="ou_audio">
+        <MediaContent>
+            <xsl:attribute name="type">audio</xsl:attribute>
+            <xsl:attribute name="src">
+                <xsl:value-of select="@src"/>
+            </xsl:attribute>
+        </MediaContent>
+    </xsl:template>
+
+    <!-- Video templates -->
+    <!-- sphinx-contrib.youtube -->
+    <xsl:template match="youtube">
+        <MediaContent>
+            <xsl:attribute name="type">oembed</xsl:attribute>
+            <xsl:attribute name="src">
+                <xsl:value-of select="@platform_url"/><xsl:value-of select="@id"/>
+            </xsl:attribute>
+        </MediaContent>
     </xsl:template>
 
     <!-- Where next templates -->
@@ -646,6 +683,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
         block = str(config["ou"]["block"])
         presentation = config["ou"]["presentation"]
         image_path_prefix = config["ou"]["image_path_prefix"] if "image_path_prefix" in config["ou"] else ""
+        audio_path_prefix = config["ou"]["audio_path_prefix"] if "audio_path_prefix" in config["ou"] else ""
         use_caption_as_title = False if "caption_as_title" not in config["ou"] else config["ou"]["caption_as_title"]
 
         if "parts" in toc:
@@ -681,6 +719,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                     {"session": 0, "section": 0, "figure": 0, "table": 0},
                     part_title,
                     image_path_prefix,
+                    audio_path_prefix,
                     toc,
                     item_title,
                     use_caption_as_title,
@@ -718,7 +757,9 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 presentation,
                 {"session": 0, "section": 0, "figure": 0, "table": 0},
                 part_title,
+                # TO DO  - pass a path_prefixes dict
                 image_path_prefix,
+                audio_path_prefix,
                 toc,
                 item_title,
                 use_caption_as_title,
