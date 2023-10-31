@@ -69,3 +69,11 @@ Options:
   -s, --schema TEXT  XML schema filepath
   --help             Show this message and exit.
 ```
+
+## BUILD and INSTALL
+
+`python3 -m build`
+
+Install as:
+
+`python3 -m pip install .`
