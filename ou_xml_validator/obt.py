@@ -441,12 +441,29 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
     </xsl:template>
 
     <!-- sphinx-contrig.ou-xml-tags -->
-    <xsl:template match="ou_audio">
+    <xsl:template match="ou_audio | ou_video">
         <MediaContent>
-            <xsl:attribute name="type">audio</xsl:attribute>
+            <xsl:choose>
+                <xsl:when test="name() = 'ou_audio'">
+                    <xsl:attribute name="type">audio</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="name() = 'ou_video'">
+                    <xsl:attribute name="type">video</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
             <xsl:attribute name="src">
                 <xsl:value-of select="@src"/>
             </xsl:attribute>
+            <xsl:if test="@height">
+                <xsl:attribute name="height">
+                    <xsl:value-of select="@height"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@width">
+                <xsl:attribute name="width">
+                    <xsl:value-of select="@width"/>
+                </xsl:attribute>
+            </xsl:if>
         </MediaContent>
     </xsl:template>
 
