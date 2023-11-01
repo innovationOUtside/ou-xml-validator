@@ -477,6 +477,7 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
                     <xsl:value-of select="@width"/>
                 </xsl:attribute>
             </xsl:if>
+            <xsl:apply-templates/>
         </MediaContent>
     </xsl:template>
 
