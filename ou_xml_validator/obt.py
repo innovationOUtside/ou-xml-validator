@@ -43,7 +43,7 @@ def fix_sub_list(node: etree.Element):
     for child in node:
         fix_sub_list(child)
 
-
+# TO DO - should we pass a prefixex dict?
 def apply_fixes(
     config: dict,
     source: str,
@@ -224,6 +224,7 @@ def apply_fixes(
                 filepath = path.join(source, "_build", "ouxml", filename)
                 os.makedirs(os.path.dirname(filepath), exist_ok=True)
                 copy(media_src, filepath)
+                node.attrib["src"] = urljoin(audio_path_prefix, filename)
             else:
                 stdout(f"can't find {media_src}")
             if node.attrib["type"]=="audio":
@@ -328,11 +329,11 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
         <ComputerUI><xsl:apply-templates/></ComputerUI>
     </xsl:template>
     <xsl:template match="literal_block">
-        </!-- We don't want to re-escape any escaped elements... -->
-        <ProgramListing><xsl:value-of select="text()" disable-output-escaping="yes"/></ProgramListing>
+        <!-- We don't want to re-escape any escaped elements...  disable-output-escaping="yes" -->
+        <ProgramListing><xsl:value-of select="text()" /></ProgramListing>
     </xsl:template>
     <xsl:template match="literal">
-        <ComputerCode><xsl:value-of select="text()" disable-output-escaping="yes"/></ComputerCode>
+        <ComputerCode><xsl:value-of select="text()" /></ComputerCode>
     </xsl:template>
 
     <!-- List templates -->
@@ -527,11 +528,20 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
     <xsl:template match="inline[@ids]"><xsl:apply-templates/></xsl:template>
     <xsl:template match="container[@ids]"><xsl:apply-templates/></xsl:template>
 
+    <!-- Glossary templates -->
     <xsl:template match="glossary">
-        <!--<Glossary><xsl:apply-templates/></Glossary> -->
+        <!-- <Glossary><xsl:apply-templates/></Glossary> -->
         <!-- SKIP FOR NOW - needs to be in backmatter -->
     </xsl:template>
     <!--
+    <xsl:template match="definition_list/definition_list_item/term">
+        <term><xsl:apply-templates/></term>
+    </xsl:template>
+    <xsl:template match="definition_list/definition_list_item/definition">
+        <definition><xsl:apply-templates/></definition>
+    </xsl:template>
+    -->
+    
     <!-- Table templates -->
     <xsl:template match="table">
         <Table><xsl:apply-templates/></Table>
