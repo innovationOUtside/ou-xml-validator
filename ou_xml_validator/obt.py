@@ -202,7 +202,7 @@ def apply_fixes(
             check=True,
         )
         img = etree.Element("Image")
-        img.attrib["src"] = filename
+        img.attrib["src"] = urljoin(image_path_prefix, filename)
         node.getparent().replace(node, img)
     elif node.tag == "Image":
         # Copy images
@@ -225,7 +225,7 @@ def apply_fixes(
                 os.makedirs(os.path.dirname(filepath), exist_ok=True)
                 copy(media_src, filepath)
             else:
-                 stdout(f"can't find {media_src}")
+                stdout(f"can't find {media_src}")
             if node.attrib["type"]=="audio":
                 node.attrib["src"] = urljoin(audio_path_prefix, filename)
     elif node.tag == "Activity":
@@ -328,10 +328,11 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
         <ComputerUI><xsl:apply-templates/></ComputerUI>
     </xsl:template>
     <xsl:template match="literal_block">
-        <ProgramListing><xsl:value-of select="text()"/></ProgramListing>
+        </!-- We don't want to re-escape any escaped elements... -->
+        <ProgramListing><xsl:value-of select="text()" disable-output-escaping="yes"/></ProgramListing>
     </xsl:template>
     <xsl:template match="literal">
-        <ComputerCode><xsl:value-of select="text()"/></ComputerCode>
+        <ComputerCode><xsl:value-of select="text()" disable-output-escaping="yes"/></ComputerCode>
     </xsl:template>
 
     <!-- List templates -->
@@ -440,6 +441,17 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
         <Answer><xsl:apply-templates/></Answer>
     </xsl:template>
 
+    <!-- Jupyter notebook code cell templates -->
+    <xsl:template match="container[@nb_element = 'cell_code']">
+        <xsl:apply-templates/>
+    </xsl:template>
+    <xsl:template match="container[@nb_element = 'cell_code_source']">
+        <xsl:apply-templates/>
+    </xsl:template>
+    <xsl:template match="container[@nb_element = 'cell_code_output']">
+        <xsl:apply-templates/>
+    </xsl:template>
+
     <!-- sphinx-contrig.ou-xml-tags -->
     <xsl:template match="ou_audio | ou_video">
         <MediaContent>
@@ -515,6 +527,11 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
     <xsl:template match="inline[@ids]"><xsl:apply-templates/></xsl:template>
     <xsl:template match="container[@ids]"><xsl:apply-templates/></xsl:template>
 
+    <xsl:template match="glossary">
+        <!--<Glossary><xsl:apply-templates/></Glossary> -->
+        <!-- SKIP FOR NOW - needs to be in backmatter -->
+    </xsl:template>
+    <!--
     <!-- Table templates -->
     <xsl:template match="table">
         <Table><xsl:apply-templates/></Table>
@@ -766,6 +783,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
             create_frontmatter(root, config)
             create_unit(config, root, toc, input_base, f"{block}: $PART_TITLE", f"{module_code} {block}: $PART_TITLE")
             part_title = xpath_single(root, "/Item/Unit/Session[1]/Title/text()")
+
             apply_fixes(
                 config,
                 source,
@@ -776,7 +794,6 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 presentation,
                 {"session": 0, "section": 0, "figure": 0, "table": 0},
                 part_title,
-                # TO DO  - pass a path_prefixes dict
                 image_path_prefix,
                 audio_path_prefix,
                 toc,
