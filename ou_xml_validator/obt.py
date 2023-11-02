@@ -15,6 +15,7 @@ from rich.progress import Progress
 from yaml import safe_load
 import pkg_resources
 import os
+from .xml_xslt import get_file
 
 app = typer.Typer()
 
@@ -54,15 +55,16 @@ def apply_fixes(
     presentation: str,
     counters: dict,
     part_title: str,
-    image_path_prefix: str,
-    audio_path_prefix: str,
     toc: dict,
     item_title: str,
-    use_caption_as_title: bool,  # noqa: FBT001
+    use_caption_as_title: bool,
 ) -> None:
     """Apply a range of post-processing fixes."""
     # Postprocessing required:
     # * Remove non-document cross-links
+    image_path_prefix = config["ou"]["image_path_prefix"] if "image_path_prefix" in config["ou"] else ""
+    audio_path_prefix = config["ou"]["audio_path_prefix"] if "audio_path_prefix" in config["ou"] else ""
+
     if node.tag == "olink":
         targetdoc = node.get("targetdoc")
         if targetdoc:
@@ -270,8 +272,6 @@ def apply_fixes(
             presentation,
             counters,
             part_title,
-            image_path_prefix,
-            audio_path_prefix,
             toc,
             item_title,
             use_caption_as_title,
@@ -280,311 +280,8 @@ def apply_fixes(
 
 def transform_content(node: etree.Element, root_node: str = "Section") -> etree.Element:
     """Apply the XSLT transforms from Sphinx XML to OU XML."""
-    stylesheet = etree.XML(
-        f"""\
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <!-- Section templates -->
-    <xsl:template match="/section">
-        <{root_node}><xsl:apply-templates/></{root_node}>
-    </xsl:template>
-    <xsl:template match="section">
-        <InternalSection><xsl:apply-templates/></InternalSection>
-    </xsl:template>
-
-    <!-- Heading templates -->
-    <xsl:template match="/section/title">
-        <Title><xsl:apply-templates/></Title>
-    </xsl:template>
-    <xsl:template match="title">
-        <Heading><xsl:apply-templates/></Heading>
-    </xsl:template>
-
-    <!-- Paragraph templates -->
-    <xsl:template match="paragraph">
-        <Paragraph><xsl:apply-templates/></Paragraph>
-    </xsl:template>
-
-    <!-- Admonition templates -->
-    <xsl:template match="admonition">
-        <Box><xsl:apply-templates/></Box>
-    </xsl:template>
-    <xsl:template match="hint">
-        <Box><Heading>Hint</Heading><xsl:apply-templates/></Box>
-    </xsl:template>
-    <xsl:template match="warning">
-        <Box><Heading>Warning</Heading><xsl:apply-templates/></Box>
-    </xsl:template>
-    <xsl:template match="attention">
-        <Box><Heading>Attention</Heading><xsl:apply-templates/></Box>
-    </xsl:template>
-    <xsl:template match="note">
-        <Box><Heading>Note</Heading><xsl:apply-templates/></Box>
-    </xsl:template>
-
-    <!-- Code block templates -->
-    <xsl:template match="inline[@classes = 'guilabel']">
-        <ComputerUI><xsl:apply-templates/></ComputerUI>
-    </xsl:template>
-    <xsl:template match="inline[@classes = 'menuselection']">
-        <ComputerUI><xsl:apply-templates/></ComputerUI>
-    </xsl:template>
-    <xsl:template match="literal_block">
-        <!-- We don't want to re-escape any escaped elements...  disable-output-escaping="yes" -->
-        <ProgramListing><xsl:value-of select="text()" /></ProgramListing>
-    </xsl:template>
-    <xsl:template match="literal">
-        <ComputerCode><xsl:value-of select="text()" /></ComputerCode>
-    </xsl:template>
-
-    <!-- List templates -->
-    <xsl:template match="bullet_list">
-        <BulletedList><xsl:apply-templates/></BulletedList>
-    </xsl:template>
-    <xsl:template match="enumerated_list">
-        <NumberedList><xsl:apply-templates/></NumberedList>
-    </xsl:template>
-    <xsl:template match="list_item">
-        <ListItem><xsl:apply-templates/></ListItem>
-    </xsl:template>
-
-    <!-- Styling templates -->
-    <xsl:template match="emphasis"><i><xsl:apply-templates/></i></xsl:template>
-    <xsl:template match="strong"><b><xsl:apply-templates/></b></xsl:template>
-
-    <!-- Reference templates -->
-    <xsl:template match="number_reference">
-        <xsl:apply-templates/>
-    </xsl:template>
-    <xsl:template match="number_reference/inline">
-        <xsl:value-of select="text()"/>
-    </xsl:template>
-
-    <xsl:template match="reference[@internal = 'True' and @refuri]" priority="10">
-        <olink>
-            <xsl:attribute name="targetdoc">
-                <xsl:value-of select="@refuri" />
-            </xsl:attribute>
-            <xsl:attribute name="targetptr">
-            </xsl:attribute>
-            <xsl:apply-templates/>
-        </olink>
-    </xsl:template>
-    <xsl:template match="reference[@refuri]">
-        <a>
-            <xsl:attribute name="href">
-                <xsl:value-of select="@refuri"/>
-            </xsl:attribute>
-            <xsl:apply-templates/>
-        </a>
-    </xsl:template>
-    <xsl:template match="reference/inline">
-        <xsl:value-of select="text()"/>
-    </xsl:template>
-    <xsl:template match="citation">
-        <Reference><xsl:apply-templates/></Reference>
-    </xsl:template>
-    <xsl:template match="citation/label"></xsl:template>
-
-    <!-- Figure templates -->
-    <xsl:template match="figure">
-        <Figure><xsl:apply-templates/></Figure>
-    </xsl:template>
-    <xsl:template match="image">
-        <Image>
-            <xsl:attribute name="src">
-                <xsl:value-of select="@uri"/>
-            </xsl:attribute>
-        </Image>
-    </xsl:template>
-    <xsl:template match="caption">
-        <Caption><xsl:apply-templates/></Caption>
-    </xsl:template>
-    <xsl:template match="legend">
-        <Description><xsl:apply-templates/></Description>
-    </xsl:template>
-
-    <xsl:template match="/section[@ids]">
-        <{root_node}>
-            <xsl:attribute name="id">
-                <xsl:value-of select="@ids"/>
-            </xsl:attribute>
-            <xsl:apply-templates/>
-        </{root_node}>
-    </xsl:template>
-    <xsl:template match="section/section[@ids]">
-        <InternalSection>
-            <xsl:attribute name="id">
-                <xsl:value-of select="@ids"/>
-            </xsl:attribute>
-            <xsl:apply-templates/>
-        </InternalSection>
-    </xsl:template>
-    <xsl:template match="reference[@internal = 'True' and @refid]" priority="10">
-        <CrossRef>
-            <xsl:attribute name="idref">
-                <xsl:value-of select="@refid"/>
-            </xsl:attribute>
-            <xsl:apply-templates/>
-        </CrossRef>
-    </xsl:template>
-
-    <!-- Activity templates -->
-    <xsl:template match="container[@design_component = 'ou-activity']">
-        <Activity><xsl:apply-templates/></Activity>
-    </xsl:template>
-    <xsl:template match="container[@design_component = 'ou-activity-title']">
-        <Heading><xsl:apply-templates/></Heading>
-    </xsl:template>
-    <xsl:template match="container[@design_component = 'ou-time']">
-        <Timing><xsl:apply-templates/></Timing>
-    </xsl:template>
-    <xsl:template match="container[@design_component = 'ou-activity-answer']">
-        <Answer><xsl:apply-templates/></Answer>
-    </xsl:template>
-
-    <!-- Jupyter notebook code cell templates -->
-    <xsl:template match="container[@nb_element = 'cell_code']">
-        <xsl:apply-templates/>
-    </xsl:template>
-    <xsl:template match="container[@nb_element = 'cell_code_source']">
-        <xsl:apply-templates/>
-    </xsl:template>
-    <xsl:template match="container[@nb_element = 'cell_code_output']">
-        <xsl:apply-templates/>
-    </xsl:template>
-
-    <!-- sphinx-contrig.ou-xml-tags -->
-    <xsl:template match="ou_audio | ou_video">
-        <MediaContent>
-            <xsl:choose>
-                <xsl:when test="name() = 'ou_audio'">
-                    <xsl:attribute name="type">audio</xsl:attribute>
-                </xsl:when>
-                <xsl:when test="name() = 'ou_video'">
-                    <xsl:attribute name="type">video</xsl:attribute>
-                </xsl:when>
-            </xsl:choose>
-            <xsl:attribute name="src">
-                <xsl:value-of select="@src"/>
-            </xsl:attribute>
-            <xsl:if test="@height">
-                <xsl:attribute name="height">
-                    <xsl:value-of select="@height"/>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="@width">
-                <xsl:attribute name="width">
-                    <xsl:value-of select="@width"/>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates/>
-        </MediaContent>
-    </xsl:template>
-
-    <!-- Video templates -->
-    <!-- sphinx-contrib.youtube -->
-    <xsl:template match="youtube">
-        <MediaContent>
-            <xsl:attribute name="type">oembed</xsl:attribute>
-            <xsl:attribute name="src">
-                <xsl:value-of select="@platform_url"/><xsl:value-of select="@id"/>
-            </xsl:attribute>
-        </MediaContent>
-    </xsl:template>
-
-    <!-- Where next templates -->
-    <xsl:template match="container[@design_component = 'ou-where-next']">
-        <Box><Heading>Now go to ...</Heading><xsl:apply-templates/></Box>
-    </xsl:template>
-
-    <!-- TOC Tree templates -->
-    <xsl:template match="compound[@classes = 'toctree-wrapper']"></xsl:template>
-
-    <!-- Mermaid templates -->
-    <xsl:template match="mermaid">
-        <Mermaid><xsl:value-of select="@code"/></Mermaid>
-    </xsl:template>
-
-    <!-- Quote templates -->
-    <!-- Transform Quote elements (via ChatGPT) -->
-    <xsl:template match="block_quote">
-        <Quote>
-            <xsl:apply-templates select="*[position() &lt; last()]" />
-            <!-- Check if the last child is a paragraph starting with "Source:" -->
-            <xsl:variable name="lastPara" select="./paragraph[last()]" />
-            <xsl:choose>
-                <xsl:when test="starts-with(normalize-space($lastPara), 'Source:')">
-                    <SourceReference>
-                        <xsl:value-of select="normalize-space(substring-after($lastPara, 'Source:'))" />
-                    </SourceReference>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:apply-templates select="$lastPara" />
-                </xsl:otherwise>
-            </xsl:choose>
-        </Quote>
-    </xsl:template>
-
-    <!-- Cross-reference templates -->
-    <xsl:template match="inline[@ids]"><xsl:apply-templates/></xsl:template>
-    <xsl:template match="container[@ids]"><xsl:apply-templates/></xsl:template>
-
-    <!-- Glossary templates -->
-    <xsl:template match="glossary">
-        <!-- <Glossary><xsl:apply-templates/></Glossary> -->
-        <!-- SKIP FOR NOW - needs to be in backmatter -->
-    </xsl:template>
-    <!--
-    <xsl:template match="definition_list/definition_list_item/term">
-        <term><xsl:apply-templates/></term>
-    </xsl:template>
-    <xsl:template match="definition_list/definition_list_item/definition">
-        <definition><xsl:apply-templates/></definition>
-    </xsl:template>
-    -->
     
-    <!-- Table templates -->
-    <xsl:template match="table">
-        <Table><xsl:apply-templates/></Table>
-    </xsl:template>
-    <xsl:template match="table/title">
-        <TableHead><xsl:apply-templates/></TableHead>
-    </xsl:template>
-    <xsl:template match="tgroup"><xsl:apply-templates/></xsl:template>
-    <xsl:template match="colspec"><xsl:apply-templates/></xsl:template>
-    <xsl:template match="tbody">
-        <tbody><xsl:apply-templates/></tbody>
-    </xsl:template>
-    <xsl:template match="thead">
-        <thead><xsl:apply-templates/></thead>
-    </xsl:template>
-    <xsl:template match="row">
-        <tr><xsl:apply-templates/></tr>
-    </xsl:template>
-    <xsl:template match="entry">
-        <td><xsl:apply-templates/></td>
-    </xsl:template>
-
-    <!-- Math templates -->
-    <xsl:template match="math">
-        <InlineEquation><TeX><xsl:apply-templates/></TeX></InlineEquation>
-    </xsl:template>
-    <xsl:template match="math_block">
-        <Equation>
-            <xsl:attribute name="id">
-                <xsl:value-of select="@label"/>
-            </xsl:attribute>
-            <TeX><xsl:value-of select="text()"/></TeX>
-        </Equation>
-    </xsl:template>
-    <!-- Remove unwanted target tag as generated in Sphinx XML -->
-    <xsl:template match="target"></xsl:template>
-
-    <xsl:template match="*">
-        <UnknownTag><xsl:value-of select="name(.)"/></UnknownTag>
-    </xsl:template>
-</xsl:stylesheet>"""
-    )
+    stylesheet = etree.XML(get_file("templates/sphinxXml2ouxml.xslt").format(root_node=root_node))
     transform = etree.XSLT(stylesheet)
     return transform(xpath_single(node, "/document/section")).getroot()
 
@@ -621,51 +318,14 @@ def create_unit(config: dict, root: etree.Element, part: dict, input_base: str, 
 
 def create_frontmatter(root: etree.Element, config: dict) -> None:
     """Create the frontmatter XML structure."""
-    frontmatter = etree.XML(
-        f"""\
-<FrontMatter>
-  <ByLine>{config["author"]}</ByLine>
-  <Imprint>
-    <Standard>
-      <GeneralInfo>
-        <Paragraph>This publication forms part of the Open University module {config["ou"]["module_code"]} {config["ou"]["module_title"]}. [The complete list of texts which make up this module can be found at the back (where applicable)]. Details of this and other Open University modules can be obtained from the Student Registration and Enquiry Service, The Open University, PO Box 197, Milton Keynes MK7 6BJ, United Kingdom (tel. +44 (0)845 300 60 90; email general-enquiries@open.ac.uk).</Paragraph>
-        <Paragraph>Alternatively, you may visit the Open University website at www.open.ac.uk where you can learn more about the wide range of modules and packs offered at all levels by The Open University.</Paragraph>
-        <Paragraph>To purchase a selection of Open University materials visit www.ouw.co.uk, or contact Open University Worldwide, Walton Hall, Milton Keynes MK7 6AA, United Kingdom for a brochure (tel. +44 (0)1908 858793; fax +44 (0)1908 858787; email ouw-customer-services@open.ac.uk).</Paragraph>
-      </GeneralInfo>
-      <Address>
-        <AddressLine>The Open University,</AddressLine>
-        <AddressLine>Walton Hall, Milton Keynes</AddressLine>
-        <AddressLine>MK7 6AA</AddressLine>
-      </Address>
-      <FirstPublished>
-        <Paragraph>First published {config["ou"]["first_published"]}</Paragraph>
-      </FirstPublished>
-      <Copyright>
-        <Paragraph>Unless otherwise stated, copyright © {datetime.now(tz=UTC).year} The Open University, all rights reserved.</Paragraph>
-      </Copyright>
-      <Rights>
-        <Paragraph>All rights reserved. No part of this publication may be reproduced, stored in a retrieval system, transmitted or utilised in any form or by any means, electronic, mechanical, photocopying, recording or otherwise, without written permission from the publisher or a licence from the Copyright Licensing Agency Ltd. Details of such licences (for reprographic reproduction) may be obtained from the Copyright Licensing Agency Ltd, Saffron House, 6-10 Kirby Street, London EC1N 8TS (website www.cla.co.uk).</Paragraph>
-        <Paragraph>Open University materials may also be made available in electronic formats for use by students of the University. All rights, including copyright and related rights and database rights, in electronic materials and their contents are owned by or licensed to The Open University, or otherwise used by The Open University as permitted by applicable law.</Paragraph>
-        <Paragraph>In using electronic materials and their contents you agree that your use will be solely for the purposes of following an Open University course of study or otherwise as licensed by The Open University or its assigns.</Paragraph>
-        <Paragraph>Except as permitted above you undertake not to copy, store in any medium (including electronic storage or use in a website), distribute, transmit or retransmit, broadcast, modify or show in public such electronic materials in whole or in part without the prior written consent of The Open University or in accordance with the Copyright, Designs and Patents Act 1988.</Paragraph>
-      </Rights>
-      <Edited>
-        <Paragraph>Edited and designed by The Open University.</Paragraph>
-      </Edited>
-      <Typeset>
-        <Paragraph>Typeset by The Open University</Paragraph>
-      </Typeset>
-      <Printed>
-        <Paragraph>Printed and bound in the United Kingdom by [name and address of the printer].</Paragraph>
-        <Paragraph />
-      </Printed>
-      <ISBN>{config["ou"]["isbn"]}</ISBN>
-      <Edition>{config["ou"]["edition"]}</Edition>
-    </Standard>
-  </Imprint>
-</FrontMatter>
-"""  # noqa: E501
-    )
+    frontmatter = etree.XML(get_file("templates/ouxml_template.xml").format(config=config,
+                                                                            module_code=config["ou"]["module_code"],
+                                                                            module_title=config["ou"]["module_title"],
+                                                                            author=config["author"],
+                                                                            first_published=config["ou"]["first_published"],
+                                                                            isbn=config["ou"]["isbn"],
+                                                                            edition=config["ou"]["edition"],
+                                                                            year=datetime.now(tz=UTC).year))
     root.append(frontmatter)
 
 
@@ -729,10 +389,8 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
         module_code = config["ou"]["module_code"]
         block = str(config["ou"]["block"])
         presentation = config["ou"]["presentation"]
-        image_path_prefix = config["ou"]["image_path_prefix"] if "image_path_prefix" in config["ou"] else ""
-        audio_path_prefix = config["ou"]["audio_path_prefix"] if "audio_path_prefix" in config["ou"] else ""
         use_caption_as_title = False if "caption_as_title" not in config["ou"] else config["ou"]["caption_as_title"]
-
+        counters = {"session": 0, "section": 0, "figure": 0, "table": 0, "html": 0}
         if "parts" in toc:
             main_task = progress.add_task("Converting", total=len(toc["parts"]))
             for part_idx, part in enumerate(toc["parts"]):
@@ -763,10 +421,8 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                     block,
                     part_idx,
                     presentation,
-                    {"session": 0, "section": 0, "figure": 0, "table": 0},
+                    counters,
                     part_title,
-                    image_path_prefix,
-                    audio_path_prefix,
                     toc,
                     item_title,
                     use_caption_as_title,
@@ -803,10 +459,8 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 block,
                 1,
                 presentation,
-                {"session": 0, "section": 0, "figure": 0, "table": 0},
+                counters,
                 part_title,
-                image_path_prefix,
-                audio_path_prefix,
                 toc,
                 item_title,
                 use_caption_as_title,

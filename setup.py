@@ -20,7 +20,13 @@ setup(
         'typer[all]'
     ],
     package_data={
-        'ou_xml_validator': [ 'xslt/*.xsl', 'xslt/*.xslt', 'schemas/*.xsd', 'schemas/mathml3/xsd/*.xsd', 'mermaid-cli/*json'],  # Include all XSD files in the schemas directory
+        'ou_xml_validator': [ 'xslt/*.xsl',
+                              'xslt/*.xslt',
+                              'templates/*.xml',
+                              'templates/*.xslt',
+                              'schemas/*.xsd',
+                              'schemas/mathml3/xsd/*.xsd',
+                              'mermaid-cli/*json'],  # Include all XSD files in the schemas directory
     },
     entry_points='''
         [console_scripts]
