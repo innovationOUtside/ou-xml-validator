@@ -2,7 +2,6 @@
 """Original author: Mark Hall, The Open Univerity."""
 """Extend by: Tony Hirst, The Open Univerity."""
 from datetime import UTC, datetime
-from importlib.resources import as_file, files
 from os import makedirs, path
 from shutil import copy, rmtree
 from subprocess import run
@@ -15,11 +14,24 @@ from rich.progress import Progress
 from yaml import safe_load
 import pkg_resources
 import os
+import zipfile
+import uuid
+
 from .xml_xslt import get_file
 
 app = typer.Typer()
 
 
+def hack_uuid():
+    while True:
+        # Generate a random UUID
+        uid = uuid.uuid4().hex
+        # There are conditions...
+        # - first character is not a digit
+        # - max 20 chars
+        if not uid[0].isdigit():
+            return uid[:20]
+        
 def xpath_single(start: etree.Element, xpath: str):
     """Retrieve a single element using XPath."""
     return start.xpath(xpath)[0]
@@ -218,7 +230,25 @@ def apply_fixes(
             copy(image_src, filepath)
             node.attrib["src"] = urljoin(image_path_prefix, filename)
     elif node.tag == "MediaContent":
-        if "src" in node.attrib:
+        if "type" in node.attrib and node.attrib["type"]=="html5":
+            # This seems to expect:
+            # - id, height and width attributes to be set
+            # - a link to a zip file
+            # - zip file must contain at least index.html
+            node.set("height", "200")
+            node.set("width", "600")
+
+            filename_stub = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html"]}'
+            filename = "index.html"
+            zipfilename = f"{filename_stub}.zip"
+            zipfilepath = path.join(source, "_build", "ouxml", zipfilename)
+            with zipfile.ZipFile(zipfilepath, "w", zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr(filename, node.text)
+            counters["html"] += 1
+            node.text = None
+            node.attrib["id"] = hack_uuid()
+            node.attrib["src"] = urljoin(audio_path_prefix, zipfilename)
+        elif "src" in node.attrib:
             media_src = path.join(source, node.attrib["src"])
             filename = node.attrib["src"]
             if path.exists(media_src):
