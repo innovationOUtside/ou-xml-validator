@@ -129,15 +129,30 @@ def apply_fixes(
     elif node.tag == "ProgramListing":
         # Add paragraphs into block-level computer displays
         lines = etree.tostring(node, encoding=str).strip()
-        lines = lines[len("<ProgramListing>") : -len("</ProgramListing>")]
+        lines = lines[len("<ProgramListing typ='esc'>") : -len("</ProgramListing>")]
         lines = lines.split("\n")
         if lines[-1].strip() == "":
             lines = lines[:-1]
-        node.text = None
-        for line in lines:
+        if node.get("typ")=="rawx":
+            pass
+        elif node.get("typ")=="raw":
             para = etree.Element("Paragraph")
-            para.text = line
+            para.text = None
+            for line in lines:
+                br = etree.Element("br")
+                para.append(br)
+                br.tail = line
+            node.text = None
             node.append(para)
+        else:
+            node.text = None
+            for line in lines:
+                para = etree.Element("Paragraph")
+                para.text = line
+                node.append(para)
+        # Delete the typ attribute
+        del node.attrib["typ"]
+        
     elif node.tag == "Reference":
         # Remove paragraphs from references
         if len(node) == 1:
