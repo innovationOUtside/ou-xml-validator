@@ -58,6 +58,8 @@ def apply_fixes(
     toc: dict,
     item_title: str,
     use_caption_as_title: bool,
+    backmatter: dict,
+    # noqa: FBT001
 ) -> None:
     """Apply a range of post-processing fixes."""
     # Postprocessing required:
@@ -275,6 +277,7 @@ def apply_fixes(
             toc,
             item_title,
             use_caption_as_title,
+            backmatter
         )
 
 
@@ -314,6 +317,7 @@ def create_unit(config: dict, root: etree.Element, part: dict, input_base: str, 
     unit.append(create_text_node("ByLine", config["author"]))
     for chapter in part["chapters"]:
         create_session(input_base, unit, chapter)
+    create_backmatter(unit, config)
 
 
 def create_frontmatter(root: etree.Element, config: dict) -> None:
@@ -328,6 +332,11 @@ def create_frontmatter(root: etree.Element, config: dict) -> None:
                                                                             year=datetime.now(tz=UTC).year))
     root.append(frontmatter)
 
+
+def create_backmatter(root: etree.Element, config: dict) -> None:
+    """Create the backmatter XML structure."""
+    node = etree.Element("BackMatter")
+    root.append(node)
 
 def create_root(config: dict, file_id: str, title: str) -> etree.Element:
     """Create the root structure."""
@@ -391,6 +400,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
         presentation = config["ou"]["presentation"]
         use_caption_as_title = False if "caption_as_title" not in config["ou"] else config["ou"]["caption_as_title"]
         counters = {"session": 0, "section": 0, "figure": 0, "table": 0, "html": 0}
+        backmatter = {}
         if "parts" in toc:
             main_task = progress.add_task("Converting", total=len(toc["parts"]))
             for part_idx, part in enumerate(toc["parts"]):
@@ -426,7 +436,9 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                     toc,
                     item_title,
                     use_caption_as_title,
+                    backmatter,
                 )
+
                 with open(
                     path.join(output_base, f"{module_code.lower()}_b{block}_p{part_idx}_{presentation.lower()}.xml"),
                     "wb",
@@ -464,6 +476,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 toc,
                 item_title,
                 use_caption_as_title,
+                backmatter
             )
             with open(path.join(output_base, f"{module_code.lower()}_{block.lower()}.xml"), "wb") as out_f:
                 out_f.write(etree.tostring(root, pretty_print=True, encoding="utf-8", xml_declaration=True))
