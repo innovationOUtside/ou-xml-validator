@@ -37,6 +37,17 @@ def xpath_single(start: etree.Element, xpath: str):
     """Retrieve a single element using XPath."""
     return start.xpath(xpath)[0]
 
+def flatten_node(node):
+    """Flatten a node to text."""
+    text_content = ""
+    if node.text:
+        text_content += node.text
+    for child in node:
+        text_content += flatten_node(child)
+        if child.tail:
+            text_content += child.tail
+    return text_content
+
 
 def create_text_node(tag: str, text: str) -> etree.Element:
     """Create a new text node."""
@@ -336,6 +347,16 @@ def apply_fixes(
             parent = node.getparent()
             parent.insert(parent.index(node), eq)
             eq.append(node)
+    elif node.tag == "GlossaryItem":    
+        term = node.find("Term").text
+        definition = flatten_node(node.find("Definition"))
+        glossary_item = etree.Element("GlossaryItem")
+        term_element = create_text_node("Term", term)
+        definition_element = create_text_node("Definition", definition)
+        glossary_item.append(term_element)
+        glossary_item.append(definition_element)
+        backmatter["nodes"].append(glossary_item)
+        node.getparent().remove(node)
     if node.text is not None and "$PART_TITLE" in node.text:
         # Fix any in-text part titles
         node.text = node.text.replace("$PART_TITLE", part_title)
@@ -385,7 +406,7 @@ def create_session(input_base: str, root: etree.Element, chapter: dict) -> None:
         root.append(session)
 
 
-def create_unit(config: dict, root: etree.Element, part: dict, input_base: str, unit_id: str, unit_title: str) -> None:
+def create_unit(config: dict, root: etree.Element, part: dict, input_base: str, unit_id: str, unit_title: str, backmatter: dict) -> None:
     """Create a single unit."""
     unit = etree.Element("Unit")
     root.append(unit)
@@ -394,7 +415,7 @@ def create_unit(config: dict, root: etree.Element, part: dict, input_base: str, 
     unit.append(create_text_node("ByLine", config["author"]))
     for chapter in part["chapters"]:
         create_session(input_base, unit, chapter)
-    create_backmatter(unit, config)
+    return unit
 
 
 def create_frontmatter(root: etree.Element, config: dict) -> None:
@@ -410,10 +431,16 @@ def create_frontmatter(root: etree.Element, config: dict) -> None:
     root.append(frontmatter)
 
 
-def create_backmatter(root: etree.Element, config: dict) -> None:
+def create_backmatter(root: etree.Element, config: dict, backmatter: dict) -> None:
     """Create the backmatter XML structure."""
     node = etree.Element("BackMatter")
+    glossary = etree.Element("Glossary")
+    for item in backmatter["nodes"]:
+        glossary.append(item)
+    node.append(glossary)
     root.append(node)
+    backmatter["nodes"] = []
+
 
 def create_root(config: dict, file_id: str, title: str) -> etree.Element:
     """Create the root structure."""
@@ -477,7 +504,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
         presentation = config["ou"]["presentation"]
         use_caption_as_title = False if "caption_as_title" not in config["ou"] else config["ou"]["caption_as_title"]
         counters = {"session": 0, "section": 0, "figure": 0, "table": 0, "html5": 0}
-        backmatter = {}
+        backmatter = {"nodes":[]}
         if "parts" in toc:
             main_task = progress.add_task("Converting", total=len(toc["parts"]))
             for part_idx, part in enumerate(toc["parts"]):
@@ -491,13 +518,14 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                     config, f"X_{module_code.lower()}_b{block}_p{part_idx}_{presentation.lower()}", item_title
                 )
                 create_frontmatter(root, config)
-                create_unit(
+                unit = create_unit(
                     config,
                     root,
                     part,
                     input_base,
                     f'Block {block}: {config["ou"]["block_title"]}',
                     f'{part["caption"]}: $PART_TITLE',
+                    backmatter,
                 )
                 part_title = xpath_single(root, "/Item/Unit/Session[1]/Title/text()")
                 apply_fixes(
@@ -515,6 +543,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                     use_caption_as_title,
                     backmatter,
                 )
+                create_backmatter(unit, config, backmatter)
 
                 with open(
                     path.join(output_base, f"{module_code.lower()}_b{block}_p{part_idx}_{presentation.lower()}.xml"),
@@ -537,7 +566,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 item_title,
             )
             create_frontmatter(root, config)
-            create_unit(config, root, toc, input_base, f"{block}: $PART_TITLE", f"{module_code} {block}: $PART_TITLE")
+            unit = create_unit(config, root, toc, input_base, f"{block}: $PART_TITLE", f"{module_code} {block}: $PART_TITLE", backmatter)
             part_title = xpath_single(root, "/Item/Unit/Session[1]/Title/text()")
 
             apply_fixes(
@@ -555,6 +584,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 use_caption_as_title,
                 backmatter
             )
+            create_backmatter(unit, config, backmatter)
             with open(path.join(output_base, f"{module_code.lower()}_{block.lower()}.xml"), "wb") as out_f:
                 out_f.write(etree.tostring(root, pretty_print=True, encoding="utf-8", xml_declaration=True))
             progress.update(main_task, advance=1)

@@ -286,17 +286,20 @@
 
     <!-- Glossary templates -->
     <xsl:template match="glossary">
-        <!-- <Glossary><xsl:apply-templates/></Glossary> -->
-        <!-- SKIP FOR NOW - needs to be in backmatter -->
+        <xsl:apply-templates/>
     </xsl:template>
-    <!--
-    <xsl:template match="definition_list/definition_list_item/term">
-        <term><xsl:apply-templates/></term>
+    <xsl:template match="definition_list">
+        <xsl:apply-templates/>
     </xsl:template>
-    <xsl:template match="definition_list/definition_list_item/definition">
-        <definition><xsl:apply-templates/></definition>
+    <xsl:template match="definition_list_item">
+        <GlossaryItem><xsl:apply-templates/></GlossaryItem>
     </xsl:template>
-    -->
+    <xsl:template match="term">
+        <Term><xsl:apply-templates/></Term>
+    </xsl:template>
+     <xsl:template match="definition">
+        <Definition><xsl:apply-templates/></Definition>
+    </xsl:template>
     
     <!-- Table templates -->
     <xsl:template match="table">
