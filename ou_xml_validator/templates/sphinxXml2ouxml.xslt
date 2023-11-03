@@ -202,7 +202,7 @@
     </xsl:template>
 
     <!-- sphinx-contrig.ou-xml-tags -->
-    <xsl:template match="ou_audio | ou_video">
+    <xsl:template match="ou_audio | ou_video | ou_html5 | ou_mol3d ">
         <MediaContent>
             <xsl:choose>
                 <xsl:when test="name() = 'ou_audio'">
@@ -210,6 +210,13 @@
                 </xsl:when>
                 <xsl:when test="name() = 'ou_video'">
                     <xsl:attribute name="type">video</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="name() = 'ou_html5'">
+                    <xsl:attribute name="type">html5</xsl:attribute>
+                </xsl:when>
+                <!-- The mol3d extension generates an HTML package. -->
+                <xsl:when test="name() = 'ou_mol3d'">
+                    <xsl:attribute name="type">html5</xsl:attribute>
                 </xsl:when>
             </xsl:choose>
             <xsl:attribute name="src">
