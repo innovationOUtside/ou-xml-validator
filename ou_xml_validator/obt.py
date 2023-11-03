@@ -3,6 +3,7 @@
 """Extend by: Tony Hirst, The Open Univerity."""
 from datetime import UTC, datetime
 from os import makedirs, path
+from pathlib import Path
 from shutil import copy, rmtree
 from subprocess import run
 from urllib.parse import urljoin
@@ -74,6 +75,17 @@ def apply_fixes(
     # noqa: FBT001
 ) -> None:
     """Apply a range of post-processing fixes."""
+
+    def _text_to_zip(text):
+        """Write text ti index.html then zip it"""
+        filename_stub = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}'
+        filename = "index.html"
+        zipfilename = f"{filename_stub}.zip"
+        zipfilepath = path.join(source, "_build", "ouxml", zipfilename)
+        with zipfile.ZipFile(zipfilepath, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr(filename, text)
+        return urljoin(audio_path_prefix, zipfilename)
+
     # Postprocessing required:
     # * Remove non-document cross-links
     image_path_prefix = config["ou"]["image_path_prefix"] if "image_path_prefix" in config["ou"] else ""
@@ -239,7 +251,9 @@ def apply_fixes(
         # Copy images
         image_src = path.join(source, node.attrib["src"])
         if path.exists(image_src):
-            filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}.png'
+            # TO DO - the suffix should be the suffix from the original file
+            suffix = Path(image_src).suffix
+            filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}{suffix}'
             filepath = path.join(source, "_build", "ouxml", filename)
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
             copy(image_src, filepath)
@@ -250,19 +264,37 @@ def apply_fixes(
             # - id, height and width attributes to be set
             # - a link to a zip file
             # - zip file must contain at least index.html
-            node.set("height", "200")
+            node.set("id", hack_uuid())
+            #node.attrib["id"] = hack_uuid()
+            node.set("height", "400")
             node.set("width", "600")
-
-            filename_stub = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html"]}'
-            filename = "index.html"
-            zipfilename = f"{filename_stub}.zip"
-            zipfilepath = path.join(source, "_build", "ouxml", zipfilename)
-            with zipfile.ZipFile(zipfilepath, "w", zipfile.ZIP_DEFLATED) as zf:
-                zf.writestr(filename, node.text)
-            counters["html"] += 1
-            node.text = None
-            node.attrib["id"] = hack_uuid()
-            node.attrib["src"] = urljoin(audio_path_prefix, zipfilename)
+            src = node.get("src")
+            if src!="":
+                zip_src = path.join(source, src)
+                suffix = Path(zip_src).suffix
+                # Check it's a zip file (.zip)
+                if suffix==".zip":
+                    # TO DO we could check that there is a top level zip file
+                    # with zipfile.ZipFile(zip_src, 'r') as zip_file:
+                    #   top_level_files = [f.filename for f in zip_file.filelist if not '/' in f.filename]
+                    #   if "index.html" in top_level_files: etc
+                    if path.exists(zip_src):
+                        filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}{suffix}'
+                        filepath = path.join(source, "_build", "ouxml", filename)
+                        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+                        copy(zip_src, filepath)
+                        node.attrib["src"] = urljoin(audio_path_prefix, filename)
+                elif suffix in [".html", '.htm']:
+                    # whatever the file, use the content for index.html and zip it
+                    with open(src, "r") as f:
+                        node.attrib["src"] = _text_to_zip(f.read())
+                    counters["html5"] += 1
+                    node.text = None
+                #TO DO - else we need a warning no asset??
+            else:
+                node.attrib["src"] = _text_to_zip(node.text)
+                counters["html5"] += 1
+                node.text = None
         elif "src" in node.attrib:
             media_src = path.join(source, node.attrib["src"])
             filename = node.attrib["src"]
@@ -444,7 +476,7 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
         block = str(config["ou"]["block"])
         presentation = config["ou"]["presentation"]
         use_caption_as_title = False if "caption_as_title" not in config["ou"] else config["ou"]["caption_as_title"]
-        counters = {"session": 0, "section": 0, "figure": 0, "table": 0, "html": 0}
+        counters = {"session": 0, "section": 0, "figure": 0, "table": 0, "html5": 0}
         backmatter = {}
         if "parts" in toc:
             main_task = progress.add_task("Converting", total=len(toc["parts"]))
