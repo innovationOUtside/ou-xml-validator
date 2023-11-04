@@ -57,22 +57,27 @@
     <xsl:template match="inline[@classes = 'menuselection']">
         <ComputerUI><xsl:apply-templates/></ComputerUI>
     </xsl:template>
+
     <xsl:template match="literal_block">
         <!-- We don't want to re-escape any escaped elements in Pyhton code at least... -->
+        <ProgramListing>
         <xsl:choose>
-            <xsl:when test="@language = 'python' or @language = 'xml'">
-                <ProgramListing>
+            <xsl:when test="@language = 'python' or @language='ipython3' or @language = 'xml'">
                     <xsl:attribute name="typ">raw</xsl:attribute>
                     <xsl:value-of select="text()" disable-output-escaping="yes"/>
                     <!-- A comment can't have a double dash in it... -->
+                    <xsl:comment><xsl:value-of select="translate(., '-', '*')" disable-output-escaping="yes"/></xsl:comment>
+                    <language><xsl:value-of select="@language"/></language>
             </xsl:when>
             <xsl:otherwise>
-                <ProgramListing>
                     <xsl:attribute name="typ">esc</xsl:attribute>
                     <xsl:value-of select="text()"/>
-                </ProgramListing>
+                    <!-- A comment can't have a double dash in it... -->
+                    <xsl:comment><xsl:value-of select="translate(., '-', '*')"/></xsl:comment>
+
             </xsl:otherwise>
         </xsl:choose>
+        </ProgramListing>
     </xsl:template>
     <xsl:template match="literal">
         <ComputerCode><xsl:value-of select="text()"/></ComputerCode>
@@ -201,8 +206,8 @@
         </MediaContent>
     </xsl:template>
 
-    <!-- sphinx-contrig.ou-xml-tags -->
-    <xsl:template match="ou_audio | ou_video | ou_html5 | ou_mol3d ">
+    <!-- sphinx-contrib.ou-xml-tags -->
+    <xsl:template match="ou_audio | ou_video | ou_html5 | ou_mol3d | ou_codestyle ">
         <MediaContent>
             <xsl:choose>
                 <xsl:when test="name() = 'ou_audio'">
@@ -216,6 +221,10 @@
                 </xsl:when>
                 <!-- The mol3d extension generates an HTML package. -->
                 <xsl:when test="name() = 'ou_mol3d'">
+                    <xsl:attribute name="type">html5</xsl:attribute>
+                </xsl:when>
+                <!-- The codestyle extension generates an HTML file. -->
+                <xsl:when test="name() = 'ou_codestyle'">
                     <xsl:attribute name="type">html5</xsl:attribute>
                 </xsl:when>
             </xsl:choose>
