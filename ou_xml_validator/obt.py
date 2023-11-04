@@ -19,9 +19,24 @@ import zipfile
 import uuid
 
 from .xml_xslt import get_file
+from .xml_validator import validate_xml
 
 app = typer.Typer()
 
+# TO DO - move to external file
+CODE_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="https://unpkg.com/prismjs@1.29.0/themes/prism.css" rel="stylesheet" />
+</head>
+<body>
+<pre><code class="language-{lang}">{code}</code></pre>
+	<script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.js"></script>
+	<script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
+"""
 
 def hack_uuid():
     while True:
@@ -88,7 +103,7 @@ def apply_fixes(
     """Apply a range of post-processing fixes."""
 
     def _text_to_zip(text):
-        """Write text ti index.html then zip it"""
+        """Write text to index.html then zip it"""
         filename_stub = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}'
         filename = "index.html"
         zipfilename = f"{filename_stub}.zip"
@@ -150,32 +165,56 @@ def apply_fixes(
                 node.attrib["idref"] = node.attrib.pop("targetptr")
                 node.attrib.pop("targetdoc")
     elif node.tag == "ProgramListing":
-        # Add paragraphs into block-level computer displays
-        lines = etree.tostring(node, encoding=str).strip()
-        lines = lines[len("<ProgramListing typ='esc'>") : -len("</ProgramListing>")]
-        lines = lines.split("\n")
-        if lines[-1].strip() == "":
-            lines = lines[:-1]
-        if node.get("typ")=="rawx":
-            pass
-        elif node.get("typ")=="raw":
-            para = etree.Element("Paragraph")
-            para.text = None
-            for line in lines:
-                br = etree.Element("br")
-                para.append(br)
-                br.tail = line
-            node.text = None
-            node.append(para)
+        language_ = node.find(".//language")
+        language = language_.text if language_ is not None else None
+        # TO DO test with "xml"
+        if config["ou"].get("codestyle")==True and language and language.lower() in ["python", "ipython3"]:
+                # Let's try to create an html widget
+                # Get the code from the comment
+                # Via chatgpt
+                code = next((child for child in node.iter() if isinstance(child, etree._Comment)), None).text
+                # Change the tag to MediaContent
+                node.tag = "MediaContent"
+                node.set("type", "html5")
+                node.set("id", hack_uuid())
+                node.set("width", "600")
+                line_height = 16 # TO DO  - make a parameter?
+                node.set("height", str(line_height *len(code.split("\n"))))
+                # Now we generate the HTML package
+                lang = 'python' if language.lower() in ["ipython", "ipython3"] else language.lower()
+                node.attrib["src"] = _text_to_zip(CODE_TEMPLATE.format(code=code, lang=lang))
+                counters["html5"] += 1
+                node.text = None
         else:
-            node.text = None
-            for line in lines:
+            # Add paragraphs into block-level computer displays
+            lines = etree.tostring(node, encoding=str).strip()
+            lines = lines[len("<ProgramListing typ='esc'>") : -len("</ProgramListing>")]
+            lines = lines.split("\n")
+            if lines[-1].strip() == "":
+                lines = lines[:-1]
+            #Should we open this up to more types?
+            if node.get("typ") in ["raw"]:
                 para = etree.Element("Paragraph")
-                para.text = line
+                para.text = None
+                for line in lines:
+                    br = etree.Element("br")
+                    para.append(br)
+                    br.tail = line
+                node.text = None
                 node.append(para)
-        # Delete the typ attribute
-        del node.attrib["typ"]
-        
+            else:
+                node.text = None
+                for line in lines:
+                    para = etree.Element("Paragraph")
+                    para.text = line
+                    node.append(para)
+        # Remove the intermediate language element
+        if language_ is not None:
+            node.remove(language_)
+        # Delete the extra attributes
+        for attr in ["typ"]:
+            if attr in node.attrib:
+                del node.attrib[attr]
     elif node.tag == "Reference":
         # Remove paragraphs from references
         if len(node) == 1:
@@ -452,9 +491,9 @@ def create_root(config: dict, file_id: str, title: str) -> etree.Element:
     root.attrib["SchemaVersion"] = "2.0"
     root.attrib["id"] = file_id
     root.attrib["Template"] = "Generic_A4_Unnumbered"
-    root.attrib["Rendering"] = "VLE2 staff (learn3)"
+    root.attrib["Rendering"] = "VLE2 modules (learn2)" # TO DO make a config setting #"VLE2 staff (learn3)"
     root.attrib["DiscussionAlias"] = "Comment"
-    root.attrib["vleglossary"] = "manual"
+    root.attrib["vleglossary"] = "auto" # Make this a config setting?
     meta = etree.Element("meta")
     meta.attrib["content"] = title
     root.append(meta)
@@ -544,11 +583,8 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                     backmatter,
                 )
                 create_backmatter(unit, config, backmatter)
-
-                with open(
-                    path.join(output_base, f"{module_code.lower()}_b{block}_p{part_idx}_{presentation.lower()}.xml"),
-                    "wb",
-                ) as out_f:
+                outfile = path.join(output_base, f"{module_code.lower()}_b{block}_p{part_idx}_{presentation.lower()}.xml")
+                with open(outfile, "wb",) as out_f:
                     out_f.write(etree.tostring(root, pretty_print=True, encoding="utf-8", xml_declaration=True))
                 progress.update(main_task, advance=1)
         else:
@@ -585,10 +621,12 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 backmatter
             )
             create_backmatter(unit, config, backmatter)
-            with open(path.join(output_base, f"{module_code.lower()}_{block.lower()}.xml"), "wb") as out_f:
+            outfile = path.join(output_base, f"{module_code.lower()}_{block.lower()}.xml")
+            with open(outfile, "wb") as out_f:
                 out_f.write(etree.tostring(root, pretty_print=True, encoding="utf-8", xml_declaration=True))
             progress.update(main_task, advance=1)
-
+        if config["ou"].get("validate")==True:
+            validate_xml(outfile)
 def main():
     """Run the OBT application."""
     app()

@@ -64,7 +64,7 @@
                 <ProgramListing>
                     <xsl:attribute name="typ">raw</xsl:attribute>
                     <xsl:value-of select="text()" disable-output-escaping="yes"/>
-                </ProgramListing>
+                    <!-- A comment can't have a double dash in it... -->
             </xsl:when>
             <xsl:otherwise>
                 <ProgramListing>
