@@ -360,14 +360,6 @@ jupyter:
         <xsl:text>__</xsl:text>
     </xsl:template>
 
-    <!-- Should we put the glossary in it's own document? Will this trump creating Backmatter doc? -->
-    <xsl:template match="Glossary">
-        <exsl:document method="html" href="{$filestub}_{format-number(count(../preceding-sibling::Unit),'00')}_glossary.md">
-            <xsl:text>&#xa;&#xa;# Glossary&#xa;</xsl:text>
-            <xsl:apply-templates />
-        </exsl:document>
-    </xsl:template>
-
     <!-- GlossaryItem elements go in the Backmatter/Glossary and
          have Term and Definition components
     -->
@@ -386,6 +378,17 @@ jupyter:
         <xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
+    <!-- Should we put the glossary in it's own document? Will this trump creating Backmatter doc? -->
+    <xsl:template match="Glossary">
+        <exsl:document method="html" href="{$filestub}_{format-number(count(../preceding-sibling::Unit),'00')}_glossary.md">
+            <xsl:text>&#xa;&#xa;# Glossary&#xa;&#xa;</xsl:text>
+            <xsl:apply-templates />
+        </exsl:document>
+    </xsl:template>
+
+    <xsl:template match="BackMatter">
+        <xsl:apply-templates />
+    </xsl:template>
 
     <xsl:template match="Box">
         <xsl:text>&#xa;</xsl:text>
