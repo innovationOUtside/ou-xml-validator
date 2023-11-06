@@ -2,7 +2,6 @@
 """Original author: Mark Hall, The Open Univerity."""
 """Extend by: Tony Hirst, The Open Univerity."""
 from datetime import UTC, datetime
-from os import makedirs, path
 from pathlib import Path
 from shutil import copy, rmtree
 from subprocess import run
@@ -107,7 +106,7 @@ def apply_fixes(
         filename_stub = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}'
         filename = "index.html"
         zipfilename = f"{filename_stub}.zip"
-        zipfilepath = path.join(source, "_build", "ouxml", zipfilename)
+        zipfilepath = Path(source) / "_build" / "ouxml" / zipfilename
         with zipfile.ZipFile(zipfilepath, "w", zipfile.ZIP_DEFLATED) as zf:
             zf.writestr(filename, text)
         return urljoin(audio_path_prefix, zipfilename)
@@ -287,9 +286,10 @@ def apply_fixes(
         mermaid_cli_path = os.path.dirname(resource_path)
         run(["npm", "install"], cwd=mermaid_cli_path, capture_output=True, check=True)  # noqa: S603 S607
         filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}.png'
-        filepath = path.join(source, "_build", "ouxml", filename)
+        filepath = Path(source) / "_build" / "ouxml" / filename
+        filepath.parent.mkdir(parents=True, exist_ok=True)
         run(
-            [path.join(mermaid_cli_path, "node_modules", ".bin", "mmdc"), "-i", "-", "-o", filepath],  # noqa: S603
+            [Path(mermaid_cli_path) / "node_modules" / ".bin" / "mmdc", "-i", "-", "-o", filepath],  # noqa: S603
             input=node.text.encode(),
             capture_output=True,
             check=True,
@@ -299,13 +299,13 @@ def apply_fixes(
         node.getparent().replace(node, img)
     elif node.tag == "Image":
         # Copy images
-        image_src = path.join(source, node.attrib["src"])
-        if path.exists(image_src):
+        image_src = Path(source) / node.attrib["src"]
+        if image_src.exists():
             # TO DO - the suffix should be the suffix from the original file
             suffix = Path(image_src).suffix
             filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}{suffix}'
-            filepath = path.join(source, "_build", "ouxml", filename)
-            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            filepath = Path(source) / "_build" / "ouxml" / filename
+            filepath.parent.mkdir(parents=True, exist_ok=True)
             copy(image_src, filepath)
             node.attrib["src"] = urljoin(image_path_prefix, filename)
     elif node.tag == "MediaContent":
@@ -320,18 +320,18 @@ def apply_fixes(
             node.set("width", "600")
             src = node.get("src")
             if src!="":
-                zip_src = path.join(source, src)
-                suffix = Path(zip_src).suffix
+                zip_src = Path(source) / src
+                suffix = zip_src.suffix
                 # Check it's a zip file (.zip)
                 if suffix==".zip":
                     # TO DO we could check that there is a top level zip file
                     # with zipfile.ZipFile(zip_src, 'r') as zip_file:
                     #   top_level_files = [f.filename for f in zip_file.filelist if not '/' in f.filename]
                     #   if "index.html" in top_level_files: etc
-                    if path.exists(zip_src):
+                    if zip_src.exists():
                         filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}{suffix}'
-                        filepath = path.join(source, "_build", "ouxml", filename)
-                        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+                        filepath = Path(source) / "_build" / "ouxml" / filename
+                        filepath.parent.mkdir(parents=True, exist_ok=True)
                         copy(zip_src, filepath)
                         node.attrib["src"] = urljoin(audio_path_prefix, filename)
                 elif suffix in [".html", '.htm']:
@@ -346,14 +346,14 @@ def apply_fixes(
                 counters["html5"] += 1
                 node.text = None
         elif "src" in node.attrib:
-            media_src = path.join(source, node.attrib["src"])
             filename = node.attrib["src"]
-            if path.exists(media_src):
+            media_src = Path(source) / filename
+            if media_src.exists():
                 filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_media_{os.path.basename(filename)}'
                 # TO DO - better naminmg convention
                 # TO DO - Needs a corresponding counter?
-                filepath = path.join(source, "_build", "ouxml", filename)
-                os.makedirs(os.path.dirname(filepath), exist_ok=True)
+                filepath = Path(source) / "_build" / "ouxml" / filename
+                filepath.parent.mkdir(parents=True, exist_ok=True)
                 copy(media_src, filepath)
                 node.attrib["src"] = urljoin(audio_path_prefix, filename)
             else:
@@ -428,7 +428,7 @@ def transform_content(node: etree.Element, root_node: str = "Section") -> etree.
 
 def create_section(input_base: str, root: etree.Element, section: dict) -> None:
     """Create the structure for a single section, which writes to a single part file."""
-    with open(path.join(input_base, f'{section["file"]}.xml')) as in_f:
+    with open(Path(input_base) / f'{section["file"]}.xml') as in_f:
         doc = etree.parse(in_f)  # noqa: S320
         section = transform_content(doc, root_node="Section")
         root.append(section)
@@ -436,7 +436,7 @@ def create_section(input_base: str, root: etree.Element, section: dict) -> None:
 
 def create_session(input_base: str, root: etree.Element, chapter: dict) -> None:
     """Create a sesssion within a file."""
-    with open(path.join(input_base, f'{chapter["file"]}.xml')) as in_f:
+    with open(Path(input_base) / f'{chapter["file"]}.xml') as in_f:
         doc = etree.parse(in_f)  # noqa: S320
         session = transform_content(doc, root_node="Session")
         if "sections" in chapter:
@@ -507,9 +507,9 @@ def create_root(config: dict, file_id: str, title: str) -> etree.Element:
 
 @app.command()
 def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int = 1):  # noqa: FBT001 FBT002
-    """Convert the content into OU XML."""
-    input_base = path.join(source, "_build", "xml")
-    if not path.exists(input_base) or regenerate:
+    """Convert the markdown files referenced in _toc.yml into OU XML."""
+    input_base = Path(source) / "_build" / "xml"
+    if not input_base.exists() or regenerate:
         result = run(
             ["jb", "build", "--builder", "custom", "--custom-builder", "xml", source], check=True  # noqa: S603 S607
         )
@@ -521,20 +521,20 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
         else:
             stdout("[red]XML building failed[/red]")
             return
-    if not path.exists(input_base):
+    if not input_base.exists():
         stdout(f"[red]Source XML directory {input_base} does not exist. Please build this first.[/red]")
     with Progress() as progress:
         clearing_task = progress.add_task("Preparing", total=3)
-        output_base = path.join(source, "_build", "ouxml")
-        if path.exists(output_base):
+        output_base = Path(source) / "_build" / "ouxml"
+        if output_base.exists():
             rmtree(output_base)
-        makedirs(output_base, exist_ok=True)
+        output_base.parent.mkdir(parents=True, exist_ok=True)
         progress.update(clearing_task, completed=1)
 
-        with open(path.join(source, "_toc.yml")) as in_f:
+        with open(Path(source) / "_toc.yml") as in_f:
             toc = safe_load(in_f)
         progress.update(clearing_task, completed=2)
-        with open(path.join(source, "_config.yml")) as in_f:
+        with open(Path(source) / "_config.yml") as in_f:
             config = safe_load(in_f)
         progress.update(clearing_task, completed=3)
 
@@ -583,7 +583,8 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                     backmatter,
                 )
                 create_backmatter(unit, config, backmatter)
-                outfile = path.join(output_base, f"{module_code.lower()}_b{block}_p{part_idx}_{presentation.lower()}.xml")
+                outfile = Path(output_base) / f"{module_code.lower()}_b{block}_p{part_idx}_{presentation.lower()}.xml"
+                outfile.parent.mkdir(parents=True, exist_ok=True)
                 with open(outfile, "wb",) as out_f:
                     out_f.write(etree.tostring(root, pretty_print=True, encoding="utf-8", xml_declaration=True))
                 progress.update(main_task, advance=1)
@@ -621,12 +622,13 @@ def convert_to_ouxml(source: str, regenerate: bool = False, numbering_from: int 
                 backmatter
             )
             create_backmatter(unit, config, backmatter)
-            outfile = path.join(output_base, f"{module_code.lower()}_{block.lower()}.xml")
+            outfile = Path(output_base) / f"{module_code.lower()}_{block.lower()}.xml"
             with open(outfile, "wb") as out_f:
                 out_f.write(etree.tostring(root, pretty_print=True, encoding="utf-8", xml_declaration=True))
             progress.update(main_task, advance=1)
         if config["ou"].get("validate")==True:
             validate_xml(outfile)
+
 def main():
-    """Run the OBT application."""
+    """Run the application to convert markdown to OU-XML."""
     app()
