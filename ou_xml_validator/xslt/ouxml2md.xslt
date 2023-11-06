@@ -9,6 +9,7 @@
 
     <!-- Defining a parameter means we can pass values in -->
     <xsl:param name="filestub">test</xsl:param>
+    <xsl:param name="myst">False</xsl:param>
 
     <xsl:output method="text" />
 
@@ -54,9 +55,9 @@
     <xsl:value-of select="normalize-space(.)"/>
   </xsl:template>
 
-    <xsl:template match="Paragraph/br">
+   <!--- <xsl:template match="Paragraph/br">
         <xsl:text>&#xa;&#xa;</xsl:text>
-    </xsl:template>
+    </xsl:template> -->
 
     <xsl:template match="br">
         <xsl:text>&#xa;</xsl:text>
@@ -69,13 +70,14 @@
             This then allows us to have multi-paragraph lists.
         -->
     <xsl:template match="Paragraph">
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:if test="parent::ListItem">
-            <xsl:text></xsl:text>
-        </xsl:if>
+        <xsl:if test="not(parent::ListItem) and not(parent::ProgramListing)"><xsl:text>&#xa;</xsl:text> </xsl:if>
+        <!-- <xsl:if test="parent::ListItem">
+            <xsl:text>    < /xsl:text>
+        </xsl:if> -->
         <xsl:apply-templates select="*|text()" />
         <xsl:text>&#xa;</xsl:text>
     </xsl:template>
+
 
     <xsl:template match="Image | Figure/Image">
         <xsl:text>&#xa;&#xa;![</xsl:text>
@@ -105,10 +107,10 @@
     <!-- I'm not sure what semantics of Quote are? eg it's used for SAQ questions? -->
     <xsl:template match="Quote">
         <xsl:text>&#xa;</xsl:text>
-        <xsl:comment>
+        <!--<xsl:comment>
             Quote id=
             <xsl:value-of select="@id" />
-        </xsl:comment>
+        </xsl:comment>-->
         <xsl:apply-templates />
         <xsl:text>&#xa;&#xa;</xsl:text>
     </xsl:template>
@@ -131,13 +133,13 @@
                 <xsl:text>. </xsl:text>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:text>* </xsl:text>
+                <xsl:text>- </xsl:text>
             </xsl:otherwise>
         </xsl:choose>
         <!-- <xsl:value-of select="normalize-space(text())" /> -->
         <!-- <xsl:apply-templates select="* except (NumberedList|BulletedList)" /> -->
         <xsl:apply-templates />
-        <xsl:text>&#xa;</xsl:text>
+        <!--<xsl:text>&#xa;</xsl:text>-->
         <xsl:apply-templates select="NumberedList|BulletedList" />
     </xsl:template>
 
@@ -426,10 +428,14 @@ jupyter:
         <xsl:text>`</xsl:text>
     </xsl:template>
 
+    <!-- There is no OU-XML tag ro attribute that carries the language-->
     <xsl:template match="ProgramListing">
+        <!-- TO DO - use a parameter to pass in the language? 
+             or do a hack to try to detect it and augment the OU-XML prior to conversion? -->
         <xsl:text>&#xa;&#xa;```python&#xa;</xsl:text>
         <xsl:apply-templates />
-        <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
+        <!--HACK: we assume there is a preceding &#xa; -->
+        <xsl:text>```&#xa;&#xa;</xsl:text>
     </xsl:template>
 
     <!-- I think this is inline code -->
@@ -559,15 +565,40 @@ jupyter:
     </xsl:template>
 
     <xsl:template match="MediaContent[@type = 'video']">
-        <xsl:comment>MEDIACONTENT</xsl:comment>
-        <!-- Stricly this is for media and we should mathc on media type=='video' -->
-        <video>
-            <xsl:attribute name="width">80%</xsl:attribute>
-            <xsl:attribute name="download" />
-            <source src='{str:split(@src, "\\")[last()]}' type="video/mp4"></source>
-        </video>
+        <xsl:choose>
+            <xsl:when test="$myst = 'True'">
+                <xsl:text>&#xa;&#xa;```{ou-video} </xsl:text>
+                <xsl:value-of select="@src" />
+                <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <video>
+                    <xsl:attribute name="width">80%</xsl:attribute>
+                    <xsl:attribute name="download" />
+                    <source src='{str:split(@src, "\\")[last()]}' type="video/mp4"></source>
+                </video>
+            </xsl:otherwise>
+        </xsl:choose>
         <xsl:apply-templates />
-        <xsl:comment>ENDMEDIACONTENT</xsl:comment>
+    </xsl:template>
+
+    <xsl:template match="MediaContent[@type = 'audio']">
+        <xsl:choose>
+            <xsl:when test="$myst = 'True'">
+                <xsl:text>&#xa;&#xa;```{ou-audio} </xsl:text>
+                <xsl:value-of select="@src" />
+                <xsl:apply-templates />
+                <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <audio>
+                    <xsl:attribute name="width">80%</xsl:attribute>
+                    <xsl:attribute name="download" />
+                    <source src='{str:split(@src, "\\")[last()]}' type="video/mp4"></source>
+                    <xsl:apply-templates />
+                </audio>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="SourceReference">
@@ -770,5 +801,9 @@ jupyter:
         <xsl:value-of select="normalize-space()"/>
     </xsl:template>
     -->
+
+    <xsl:template match="*">
+        <xsl:comment>UnknownTag: <xsl:value-of select="name()"/> :UnknownTag</xsl:comment>
+    </xsl:template>
 
 </xsl:stylesheet>
