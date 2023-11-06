@@ -471,10 +471,12 @@ def create_frontmatter(root: etree.Element, config: dict) -> None:
 def create_backmatter(root: etree.Element, config: dict, backmatter: dict) -> None:
     """Create the backmatter XML structure."""
     node = etree.Element("BackMatter")
-    glossary = etree.Element("Glossary")
-    for item in backmatter["nodes"]:
-        glossary.append(item)
-    node.append(glossary)
+    # TO DO: this should really be backmatter["glossary"]["items"]?
+    if backmatter["nodes"]:
+        glossary = etree.Element("Glossary")
+        for item in backmatter["nodes"]:
+            glossary.append(item)
+        node.append(glossary)
     root.append(node)
     backmatter["nodes"] = []
 
