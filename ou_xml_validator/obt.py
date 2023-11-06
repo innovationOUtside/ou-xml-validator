@@ -260,7 +260,6 @@ def apply_fixes(
         # Also support figure level numbering
         # numfig_secnum_depth
         # WARNING: this is at odds with Sphinx, where the default is numfig_secnum_depth:1
-        counters["figure"] += 1
         numfig_secnum_depth = config["sphinx"]["config"].get("numfig_secnum_depth", 0)
         if numfig_secnum_depth == 1:
             if "figure_ref" not in counters:
@@ -279,6 +278,7 @@ def apply_fixes(
         # Render the Mermaid graphs
         #mermaid_cli = files("ou_book_theme.cli") / "mermaid-cli"
         #with as_file(mermaid_cli) as mermaid_cli_path:
+        counters["figure"] += 1
         resource_path = pkg_resources.resource_filename(__name__, 'mermaid-cli/package.json')
         mermaid_cli_path = os.path.dirname(resource_path)
         run(["npm", "install"], cwd=mermaid_cli_path, capture_output=True, check=True)  # noqa: S603 S607
@@ -298,6 +298,7 @@ def apply_fixes(
         # Copy images
         image_src = Path(source) / node.attrib["src"]
         if image_src.exists():
+            counters["figure"] += 1
             # TO DO - the suffix should be the suffix from the original file
             suffix = Path(image_src).suffix
             filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_fig{counters["figure"]}{suffix}'
