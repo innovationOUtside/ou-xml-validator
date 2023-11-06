@@ -9,6 +9,8 @@ from yaml import safe_load
 
 from .xml_xslt import get_file
 
+DEFAULT_LANG = "python"
+
 app = typer.Typer()
 
 def apply_xml_fixes(config: dict, node: etree.Element,) -> None:
@@ -25,6 +27,16 @@ def apply_xml_fixes(config: dict, node: etree.Element,) -> None:
             # Define a regular expression pattern to match the figure number
             pattern = r'^Figure \d+(\.\d+)*\s+'
             node.text = re.sub(pattern, '', node.text)
+    elif node.tag == "ProgramListing":
+        node.set("language", subconfig["code_lang"])
+        first_para = node.find(".//Paragraph")
+        if len(first_para):
+            if first_para.text.startswith("`"):
+                consecutive_backticks = re.match(r'`+', first_para.text)
+                fence_len = len(consecutive_backticks.group(0)) if consecutive_backticks else 3
+                node.set("fence", "`" * (fence_len+1))
+                node.set("language", "text")
+
     for child in node:
         apply_xml_fixes(config, child,)
 
@@ -32,6 +44,7 @@ def transform_xml2md(xml, config, xslt="templates/ouxml2md.xslt", output_path_st
     """Take an OU-XML document as a string 
        and transform the document to one or more markdown files."""
     subconfig = config["ou"].get("ouxml2md", {})
+    subconfig["code_lang"] = subconfig.get("code_lang", DEFAULT_LANG)
     myst = subconfig.get("myst", False)
     if xml.endswith('.xml') and Path(xml).is_file():
         with open(xml, 'r') as f:

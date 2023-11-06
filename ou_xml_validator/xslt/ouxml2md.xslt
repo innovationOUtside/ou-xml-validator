@@ -433,12 +433,15 @@ jupyter:
 
     <!-- There is no OU-XML tag ro attribute that carries the language-->
     <xsl:template match="ProgramListing">
-        <!-- TO DO - use a parameter to pass in the language? 
-             or do a hack to try to detect it and augment the OU-XML prior to conversion? -->
-        <xsl:text>&#xa;&#xa;```python&#xa;</xsl:text>
+        <!-- In pre-processing, add a language attribute... -->
+        <xsl:text>&#xa;&#xa;</xsl:text>
+        <xsl:value-of select="@fence"/>
+        <xsl:value-of select="@language"/>
+        <xsl:text>&#xa;</xsl:text>
         <xsl:apply-templates />
         <!--HACK: we assume there is a preceding &#xa; -->
-        <xsl:text>```&#xa;&#xa;</xsl:text>
+        <xsl:value-of select="@fence"/>
+        <xsl:text>&#xa;&#xa;</xsl:text>
     </xsl:template>
 
     <!-- I think this is inline code -->
