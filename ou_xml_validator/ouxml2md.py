@@ -61,8 +61,6 @@ def transform_xml2md(xml, config, xslt="templates/ouxml2md.xslt", output_path_st
         myst=etree.XSLT.strparam(str(myst))
     )
     #print(output_doc)
-    print(f'head {subconfig.get("remove_header_captions", False)}')
-    print(f'figure {subconfig.get("remove_figure_captions", False)}')
 
 @app.command()
 def convert_to_markdown(source: str, config: str = "./_config.yml", xslt: str = "xslt/ouxml2md.xslt", output_path_stub: str = "",  regenerate: bool = False, numbering_from: int = 1):  # noqa: FBT001 FBT002
