@@ -17,6 +17,7 @@ import os
 import zipfile
 import uuid
 
+from .utils import xpath_single
 from .xml_xslt import get_file
 from .xml_validator import validate_xml
 
@@ -46,10 +47,6 @@ def hack_uuid():
         # - max 20 chars
         if not uid[0].isdigit():
             return uid[:20]
-        
-def xpath_single(start: etree.Element, xpath: str):
-    """Retrieve a single element using XPath."""
-    return start.xpath(xpath)[0]
 
 def flatten_node(node):
     """Flatten a node to text."""
