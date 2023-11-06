@@ -32,5 +32,6 @@ setup(
         [console_scripts]
         ou_xml_validator=ou_xml_validator.cli:cli
         ouseful_obt=ou_xml_validator.obt:main
+        ouseful_ouxml2md=ou_xml_validator.ouxml2md:main
     '''
 )
