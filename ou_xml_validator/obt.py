@@ -163,12 +163,18 @@ def apply_fixes(
     elif node.tag == "ProgramListing":
         language_ = node.find(".//language")
         language = language_.text if language_ is not None else None
+        # Remove the intermediate language element
+        if language_ is not None:
+            node.remove(language_)
+        # Get the code from the comment
+        # Via chatgpt
+        comment = next((child for child in node.iter() if isinstance(child, etree._Comment)), None)
+        code = comment.text
+        if comment is not None:
+            comment.getparent().remove(comment)
         # TO DO test with "xml"
         if config["ou"].get("codestyle")==True and language and language.lower() in ["python", "ipython3"]:
                 # Let's try to create an html widget
-                # Get the code from the comment
-                # Via chatgpt
-                code = next((child for child in node.iter() if isinstance(child, etree._Comment)), None).text
                 # Change the tag to MediaContent
                 node.tag = "MediaContent"
                 node.set("type", "html5")
@@ -191,8 +197,8 @@ def apply_fixes(
             #Should we open this up to more types?
             if node.get("typ") in ["raw"]:
                 para = etree.Element("Paragraph")
-                para.text = None
-                for line in lines:
+                para.text = lines[0]
+                for line in lines[1:]:
                     br = etree.Element("br")
                     para.append(br)
                     br.tail = line
@@ -204,9 +210,6 @@ def apply_fixes(
                     para = etree.Element("Paragraph")
                     para.text = line
                     node.append(para)
-        # Remove the intermediate language element
-        if language_ is not None:
-            node.remove(language_)
         # Delete the extra attributes
         for attr in ["typ"]:
             if attr in node.attrib:

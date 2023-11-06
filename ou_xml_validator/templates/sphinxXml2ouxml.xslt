@@ -62,7 +62,7 @@
         <!-- We don't want to re-escape any escaped elements in Pyhton code at least... -->
         <ProgramListing>
         <xsl:choose>
-            <xsl:when test="@language = 'python' or @language='ipython3' or @language = 'xml'">
+            <xsl:when test="@language = 'python' or @language='ipython3' or @language = 'xml' or @language = 'text'">
                     <xsl:attribute name="typ">raw</xsl:attribute>
                     <xsl:value-of select="text()" disable-output-escaping="yes"/>
                     <!-- A comment can't have a double dash in it... -->
@@ -74,7 +74,6 @@
                     <xsl:value-of select="text()"/>
                     <!-- A comment can't have a double dash in it... -->
                     <xsl:comment><xsl:value-of select="translate(., '-', '*')"/></xsl:comment>
-
             </xsl:otherwise>
         </xsl:choose>
         </ProgramListing>
