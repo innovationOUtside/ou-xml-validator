@@ -79,28 +79,24 @@
     </xsl:template>
 
 
-    <xsl:template match="Image | Figure/Image">
-        <xsl:text>&#xa;&#xa;![</xsl:text>
-        <!-- <xsl:value-of select="@alt" /> -->
-        <xsl:choose>
-            <xsl:when test="../Alternative">
-                <xsl:value-of select="../Alternative" />
-            </xsl:when>
-            <xsl:when test="../Description">
-                <xsl:value-of select="../Description" />
-            </xsl:when>
-            <xsl:otherwise>
-                figure
-                <xsl:value-of select='str:split(@src, "\\")[last()]' />
-                <!--<xsl:value-of select="generate-id()"/> -->
-            </xsl:otherwise>
-        </xsl:choose>
-        <xsl:text>](</xsl:text>
+    <xsl:template match="Figure/Image">
+        <xsl:text>&#xa;&#xa;```{figure} </xsl:text>
         <!-- <xsl:value-of select="@src" /> -->
         <!-- preprocess the XML to swap in image paths we can resolve? -->
         <!-- Alternatively we could leave the full image path here map on that; more likely to be unique? -->
-        <xsl:value-of select='str:split(@src, "\\")[last()]' />
-        <xsl:text>)&#xa;</xsl:text>
+        <xsl:value-of select='str:split(@src, "\")[last()]' />
+        <!-- Caption -->
+        <xsl:apply-templates select="../Caption"/>
+        <!-- <xsl:value-of select="@alt" /> -->
+        <xsl:choose>
+            <xsl:when test="../Alternative">
+                <xsl:apply-templates select="../Alternative"/>
+            </xsl:when>
+            <xsl:when test="../Description">
+                <xsl:apply-templates select="../Description"/>
+            </xsl:when>
+        </xsl:choose>
+        <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
     </xsl:template>
 
     <!-- TO DO: does this also have to cope with situation where there is no internal paragraph? -->
@@ -638,11 +634,10 @@ jupyter:
     </xsl:template>
 
     <xsl:template match="Caption">
-        <xsl:text>&#xa;&#xa;</xsl:text>
+        <xsl:text>&#xa;</xsl:text>
         <xsl:apply-templates />
         <xsl:text>&#xa;&#xa;</xsl:text>
     </xsl:template>
-
 
     <xsl:template match="Chemistry">
         <xsl:comment>CHEMISTRY</xsl:comment>
@@ -691,8 +686,13 @@ jupyter:
         <xsl:comment>ENDDIALOGUE</xsl:comment>
     </xsl:template>
 
-    <xsl:template match="Alternative"></xsl:template>
-    <xsl:template match="Description"></xsl:template>
+    <!-- TO DO - does alternative exist?? -->
+    <xsl:template match="Alternative">
+        <xsl:apply-templates />
+    </xsl:template>
+    <xsl:template match="Description">
+        <xsl:apply-templates />
+    </xsl:template>
 
     <xsl:template match="SAQ">
         <xsl:comment>
