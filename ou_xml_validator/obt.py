@@ -180,12 +180,12 @@ def apply_fixes(
                 node.set("type", "html5")
                 node.set("id", hack_uuid())
                 node.set("width", "600")
+                counters["html5"] += 1
                 line_height = 16 # TO DO  - make a parameter?
                 node.set("height", str(line_height *len(code.split("\n"))))
                 # Now we generate the HTML package
                 lang = 'python' if language.lower() in ["ipython", "ipython3"] else language.lower()
                 node.attrib["src"] = _text_to_zip(CODE_TEMPLATE.format(code=code, lang=lang))
-                counters["html5"] += 1
                 node.text = None
         else:
             # Add paragraphs into block-level computer displays
