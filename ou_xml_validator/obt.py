@@ -335,7 +335,8 @@ def apply_fixes(
                         filepath.parent.mkdir(parents=True, exist_ok=True)
                         copy(zip_src, filepath)
                         node.attrib["src"] = urljoin(audio_path_prefix, filename)
-                elif suffix in [".html", '.htm']:
+                        counters["html5"] += 1
+                elif suffix in [".html", ".htm"]:
                     # whatever the file, use the content for index.html and zip it
                     with open(src, "r") as f:
                         node.attrib["src"] = _text_to_zip(f.read())
