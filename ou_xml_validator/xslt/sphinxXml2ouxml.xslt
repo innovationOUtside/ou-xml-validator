@@ -174,6 +174,7 @@
         </CrossRef>
     </xsl:template>
 
+    <!-- For activity from ou-book-theme -->
     <!-- Activity templates -->
     <xsl:template match="container[@design_component = 'ou-activity']">
         <Activity><xsl:apply-templates/></Activity>
@@ -186,6 +187,20 @@
     </xsl:template>
     <xsl:template match="container[@design_component = 'ou-activity-answer']">
         <Answer><xsl:apply-templates/></Answer>
+    </xsl:template>
+    <xsl:template match="container[@design_component = 'ou-exercise']">
+        <Exercise><xsl:apply-templates/>
+
+        </Exercise>
+    </xsl:template>
+    <xsl:template match="container[@design_component = 'ou-title']">
+        <Heading><xsl:apply-templates/></Heading>
+    </xsl:template>
+    <xsl:template match="container[@design_component = 'ou-answer']">
+        <Answer><xsl:apply-templates/></Answer>
+    </xsl:template>
+    <xsl:template match="container[@design_component = 'ou-discussion']">
+        <Discussion><xsl:apply-templates/></Discussion>
     </xsl:template>
 
     <!-- Jupyter notebook code cell templates -->

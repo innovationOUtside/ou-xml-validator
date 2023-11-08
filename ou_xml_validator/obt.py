@@ -421,8 +421,10 @@ def apply_fixes(
 
 def transform_content(node: etree.Element, root_node: str = "Section") -> etree.Element:
     """Apply the XSLT transforms from Sphinx XML to OU XML."""
-    
-    stylesheet = etree.XML(get_file("templates/sphinxXml2ouxml.xslt").format(root_node=root_node))
+
+    stylesheet = etree.XML(
+        get_file("xslt/sphinxXml2ouxml.xslt").format(root_node=root_node)
+    )
     transform = etree.XSLT(stylesheet)
     return transform(xpath_single(node, "/document/section")).getroot()
 
