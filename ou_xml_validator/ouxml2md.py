@@ -18,12 +18,11 @@ def apply_xml_fixes(config: dict, node: etree.Element,) -> None:
        The must be non-lossy in all essential respects if we are to support round-tripping."""
     subconfig = config["ou"].get("ouxml2md", {})
     if node.tag == "Title":
-        if node.text and subconfig.get("remove_header_captions", False):
+        if node.text and subconfig.get("remove_header_numbering", False):
             pattern = r'^\d+(\.\d+)*\s+'
             node.text = re.sub(pattern, '', node.text)
     elif node.tag == "Caption":
-        if node.text and subconfig.get("remove_figure_captions", False):
-            # TO DO - use a config param to clean figure captions
+        if node.text and subconfig.get("remove_figure_numbering", False):
             # Define a regular expression pattern to match the figure number
             pattern = r'^Figure \d+(\.\d+)*\s+'
             node.text = re.sub(pattern, '', node.text)
