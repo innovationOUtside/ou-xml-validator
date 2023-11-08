@@ -242,19 +242,67 @@
                     <xsl:attribute name="type">html5</xsl:attribute>
                 </xsl:when>
             </xsl:choose>
-            <xsl:attribute name="src">
-                <xsl:value-of select="@src"/>
-            </xsl:attribute>
-            <xsl:if test="@height">
-                <xsl:attribute name="height">
-                    <xsl:value-of select="@height"/>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="@width">
-                <xsl:attribute name="width">
-                    <xsl:value-of select="@width"/>
-                </xsl:attribute>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="@codesnippet='True'">
+                    <xsl:attribute name="codesnippet">True</xsl:attribute>
+                    <!-- Generate invalid OU0XML handled in post-preocessing -->
+                    <!-- We could default this? -->
+                    <!-- https://openuniv.sharepoint.com/sites/modules%E2%80%93shared/imd/widgets/CL/codesnippet/cl_codesnippet_v1.0.zip -->
+                    <!-- Ideally, this would come from a setting... -->
+                    <xsl:attribute name="codesrc"><xsl:value-of select="@src"/></xsl:attribute>
+                    <xsl:attribute name="src">https://openuniv.sharepoint.com/sites/modules%E2%80%93shared/imd/widgets/CL/codesnippet/cl_codesnippet_v1.0.zip</xsl:attribute>
+                    <xsl:if test="@height">
+                        <xsl:attribute name="height">
+                            <xsl:value-of select="@height"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="@width">
+                        <xsl:attribute name="width">
+                            <xsl:value-of select="@width"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <Parameters>
+                        <xsl:if test="@codetype">
+                            <Parameter>
+                                <xsl:attribute name="name">codetype</xsl:attribute>
+                                <xsl:attribute name="value"><xsl:value-of select="@codetype"/></xsl:attribute>
+                            </Parameter>
+                        </xsl:if>
+                        <Parameter>
+                            <xsl:attribute name="name">theme</xsl:attribute>
+                            <xsl:attribute name="value">
+                                <xsl:choose>
+                                    <xsl:when test="@theme">      
+                                        <xsl:value-of select="@theme"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>light</xsl:otherwise>
+                                    </xsl:choose>
+                            </xsl:attribute>
+                        </Parameter>
+                    </Parameters>
+                    <Attachments>
+					    <Attachment>
+                            <xsl:attribute name="name">codesnippet</xsl:attribute>
+                            <xsl:attribute name="src"><xsl:value-of select="@src"/></xsl:attribute>
+                        </Attachment>
+				    </Attachments>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="src">
+                        <xsl:value-of select="@src"/>
+                    </xsl:attribute>
+                    <xsl:if test="@height">
+                        <xsl:attribute name="height">
+                            <xsl:value-of select="@height"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="@width">
+                        <xsl:attribute name="width">
+                            <xsl:value-of select="@width"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:apply-templates/>
         </MediaContent>
     </xsl:template>

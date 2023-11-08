@@ -216,7 +216,7 @@ def apply_fixes(
             lang = 'python' if language.lower() in ["ipython", "ipython3"] else language.lower()
             node.attrib["src"] = _text_to_htmlzip(CODE_TEMPLATE.format(code=code, lang=lang))
             node.text = None"""
-            # Rather than create oour own HTML5 package
+            # Rather than create our own HTML5 package
             # we can use the OU codesnippet package
             node.tag = "MediaContent"
             node.set("type", "html5")
@@ -237,6 +237,11 @@ def apply_fixes(
                 else language.lower(),
             )
             params.append(code_param)
+            theme_param = etree.Element("Parameter")
+            theme_param.set("name", "theme")
+            theme_param.set("value", config["ou"].get("codesnippet_theme", "light"))
+            # <Parameter name="theme" value="light" /> # else dark
+            params.append(theme_param)
             attachments = etree.Element("Attachments")
             attachment = etree.Element("Attachment")
             attachment.set("name", "codesnippet")
@@ -396,7 +401,17 @@ def apply_fixes(
             copy(image_src, filepath)
             node.attrib["src"] = urljoin(image_path_prefix, filename)
     elif node.tag == "MediaContent":
-        if "type" in node.attrib and node.attrib["type"] == "html5":
+        if "codesnippet" in node.attrib:
+            # We need to copy over the code file
+            src = node.get("codesrc")
+            _src = Path(source) / src
+            suffix = _src.suffix
+            filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}{suffix}'
+            filepath = Path(source) / "_build" / "ouxml" / filename
+            copy(src, filepath)
+            node.find('.//Attachment[@name="codesnippet"]').attrib["src"] = urljoin(audio_path_prefix, filename)
+            counters["html5"] += 1
+        elif "type" in node.attrib and node.attrib["type"] == "html5":
             # This seems to expect:
             # - id, height and width attributes to be set
             # - a link to a zip file
@@ -449,6 +464,9 @@ def apply_fixes(
                 stdout(f"can't find {media_src}")
             if node.attrib["type"] == "audio":
                 node.attrib["src"] = urljoin(audio_path_prefix, filename)
+        for attr in ["codesnippet", "codesrc", "theme"]:  # Just in case
+           if attr in node.attrib:
+               del node.attrib[attr]
     elif node.tag in ["Activity", "Exercise", "ITQ"]:
         # Wrap the activity content in a Question
         question = None
