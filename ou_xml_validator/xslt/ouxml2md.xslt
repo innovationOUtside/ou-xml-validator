@@ -248,32 +248,32 @@ jupyter:
     </xsl:template>
 
 
-    <!-- should we need to add metadata here somewhow? -->
+    <!-- Make something more generic and customised eg with activity? -->
     <xsl:template match="Exercise">
+        <!--<xsl:comment> #region tags=["style-exercise"] </xsl:comment><xsl:text>&#xa;</xsl:text>-->
+        <xsl:text>&#xa;&#xa;````{exercise} </xsl:text>
         <xsl:apply-templates />
-        <xsl:text>&#xa;&#xa;</xsl:text>
+        <xsl:text>&#xa;````&#xa;&#xa;</xsl:text>
+        <!--<xsl:comment> #endregion </xsl:comment>>-->
     </xsl:template>
 
-
-    <xsl:template match="Exercise/Heading">
-        <xsl:text>&#xa;&#xa;### </xsl:text>
-        <xsl:value-of select="." />
-        <xsl:text>&#xa;</xsl:text>
+    <xsl:template match="Activity/Heading | Exercise/Heading" >
+        <xsl:value-of select="normalize-space(.)" /><xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
     <xsl:template match="Timing">
-        <xsl:text>__Timing: </xsl:text>
-        <xsl:value-of select="." />
-        <xsl:text>__&#xa;</xsl:text>
+        <xsl:text>:timing: </xsl:text>
+        <xsl:value-of select="normalize-space(.)" />
+        <xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
     <xsl:template match="Question">
-        <xsl:text>&#xa;&#xa;#### Question&#xa;</xsl:text>
+        <xsl:text>&#xa;</xsl:text>
         <xsl:apply-templates />
-
+        <xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
-    <xsl:template match="Activity//Discussion">
+   <!-- <xsl:template match="Activity//Discussion">
         <xsl:text>&#xa;</xsl:text>
         <xsl:comment> #endregion </xsl:comment>
         <xsl:text>&#xa;&#xa;</xsl:text>
@@ -286,17 +286,19 @@ jupyter:
         <xsl:apply-templates />
         <xsl:comment> #endregion </xsl:comment>
         <xsl:text>&#xa;</xsl:text>
-    </xsl:template>
+    </xsl:template> -->
 
     <xsl:template match="Discussion">
-        <xsl:text>&#xa;&#xa;#### Discussion&#xa;</xsl:text>
-        <xsl:apply-templates />
+        <xsl:text>&#xa;&#xa;```{ou-discussion}&#xa;</xsl:text>
+            <xsl:apply-templates />
+        <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
     </xsl:template>
 
 
     <xsl:template match="Answer">
-        <xsl:text>&#xa;&#xa;#### Answer&#xa;</xsl:text>
-        <xsl:apply-templates />
+        <xsl:text>&#xa;&#xa;```{ou-answer}&#xa;</xsl:text>
+            <xsl:apply-templates />
+        <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
     </xsl:template>
 
 
@@ -390,7 +392,6 @@ jupyter:
         <xsl:text>&#xa;</xsl:text>
         <xsl:comment> #region tags=["style-box", "alert-success"] </xsl:comment>
         <xsl:apply-templates /><xsl:text>&#xa;</xsl:text>
-        <xsl:comment> #endregion </xsl:comment>
         <xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
@@ -405,20 +406,10 @@ jupyter:
         OPTIONAL: <Heading>, <Timing>, <Multipart> X, <MediaContent>, <Interaction> X, <Answer>, <Discussion>
     -->
     <xsl:template match="Activity">
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:comment> #region tags=["style-activity"] </xsl:comment><xsl:text>&#xa;</xsl:text>
-        <xsl:text>```{admonition} Activity</xsl:text>
+        <!--<xsl:comment>#region tags=["style-activity"] </xsl:comment>-->
+        <xsl:text>&#xa;&#xa;````{activity} </xsl:text>
         <xsl:apply-templates />
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:text>```</xsl:text>
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:comment> #endregion </xsl:comment><xsl:text>&#xa;</xsl:text>
-    </xsl:template>
-
-    <xsl:template match="Activity/Heading">
-        <xsl:text>&#xa;### </xsl:text>
-        <xsl:value-of select="." />
-        <xsl:text>&#xa;</xsl:text>
+        <xsl:text>&#xa;````&#xa;&#xa;</xsl:text>
     </xsl:template>
 
     <xsl:template match="ComputerUI">
