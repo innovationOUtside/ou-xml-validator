@@ -77,3 +77,9 @@ Options:
 Install as:
 
 `python3 -m pip install .`
+
+## TESTING
+
+Tests in progress...
+
+pytest 
