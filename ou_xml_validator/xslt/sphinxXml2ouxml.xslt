@@ -93,6 +93,14 @@
         <ListItem><xsl:apply-templates/></ListItem>
     </xsl:template>
 
+    <xsl:template match="bullet_list[ancestor::bullet_list or ancestor::enumerated_list]">
+        <BulletedSubsidiaryList><xsl:apply-templates/></BulletedSubsidiaryList>
+    </xsl:template>
+
+    <xsl:template match="enumerated_list[ancestor::bullet_list or ancestor::enumerated_list]">
+        <NumberedSubsidiaryList><xsl:apply-templates/></NumberedSubsidiaryList>
+    </xsl:template>
+
     <!-- Styling templates -->
     <xsl:template match="emphasis"><i><xsl:apply-templates/></i></xsl:template>
     <xsl:template match="strong"><b><xsl:apply-templates/></b></xsl:template>
@@ -188,6 +196,41 @@
     <xsl:template match="container[@design_component = 'ou-activity-answer']">
         <Answer><xsl:apply-templates/></Answer>
     </xsl:template>
+    <xsl:template match="container[@design_component = 'Wrong']">
+        <Wrong><Paragraph><xsl:value-of select="text()"/></Paragraph>
+            <xsl:apply-templates select="child::*"/>
+        </Wrong>
+    </xsl:template>
+    <xsl:template match="container[@design_component = 'Right']">
+        <Right><Paragraph><xsl:value-of select="text()"/></Paragraph>
+            <xsl:apply-templates select="child::*"/>
+        </Right>
+    </xsl:template>
+    <xsl:template match="container[@design_component = 'Feedback']">
+        <Feedback><Paragraph><xsl:apply-templates/></Paragraph></Feedback>
+    </xsl:template>
+    <xsl:template match="container[@design_component = 'ou-interaction']">
+        <Interaction>
+            <xsl:choose>
+                <xsl:when test="@type = 'freeresponse'">
+                    <FreeResponse>
+                        <xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
+                        <xsl:attribute name="size"><xsl:value-of select="@size"/></xsl:attribute>
+                    </FreeResponse>
+                </xsl:when>
+                <xsl:when test="@type = 'multiple'">
+                    <MultipleChoice>
+                        <xsl:apply-templates/>
+                    </MultipleChoice>
+                </xsl:when>
+                <xsl:when test="@type = 'single'">
+                    <SingleChoice>
+                        <xsl:apply-templates/>
+                    </SingleChoice>
+                </xsl:when>
+            </xsl:choose>
+        </Interaction>
+    </xsl:template>
     <xsl:template match="container[@design_component = 'ou-exercise']">
         <Exercise><xsl:apply-templates/>
 
@@ -242,25 +285,29 @@
                     <xsl:attribute name="type">html5</xsl:attribute>
                 </xsl:when>
             </xsl:choose>
+            <xsl:if test="@height">
+                <xsl:attribute name="height">
+                    <xsl:value-of select="@height"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@width">
+                <xsl:attribute name="width">
+                    <xsl:value-of select="@width"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@keep">
+                <xsl:attribute name="keep">
+                    <xsl:value-of select="@keep"/>
+                </xsl:attribute>
+            </xsl:if>
             <xsl:choose>
                 <xsl:when test="@codesnippet='True'">
-                    <xsl:attribute name="codesnippet">True</xsl:attribute>
-                    <!-- Generate invalid OU0XML handled in post-preocessing -->
-                    <!-- We could default this? -->
-                    <!-- https://openuniv.sharepoint.com/sites/modules%E2%80%93shared/imd/widgets/CL/codesnippet/cl_codesnippet_v1.0.zip -->
+                    <!-- Default: https://openuniv.sharepoint.com/sites/modules%E2%80%93shared/imd/widgets/CL/codesnippet/cl_codesnippet_v1.0.zip -->
                     <!-- Ideally, this would come from a setting... -->
-                    <xsl:attribute name="codesrc"><xsl:value-of select="@src"/></xsl:attribute>
                     <xsl:attribute name="src">https://openuniv.sharepoint.com/sites/modules%E2%80%93shared/imd/widgets/CL/codesnippet/cl_codesnippet_v1.0.zip</xsl:attribute>
-                    <xsl:if test="@height">
-                        <xsl:attribute name="height">
-                            <xsl:value-of select="@height"/>
-                        </xsl:attribute>
-                    </xsl:if>
-                    <xsl:if test="@width">
-                        <xsl:attribute name="width">
-                            <xsl:value-of select="@width"/>
-                        </xsl:attribute>
-                    </xsl:if>
+                    <!-- Generate invalid OU-XML handled in post-preocessing -->
+                    <xsl:attribute name="codesnippet">True</xsl:attribute>
+                    <xsl:attribute name="codesrc"><xsl:value-of select="@src"/></xsl:attribute>
                     <Parameters>
                         <xsl:if test="@codetype">
                             <Parameter>
@@ -287,23 +334,26 @@
                         </Attachment>
 				    </Attachments>
                 </xsl:when>
+                <xsl:when test="@interactivetype='Xshinylite-py'">
+                    <!-- We need to call the appropriate HTML widget... -->
+                    
+                    <xsl:attribute name="src">https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags/raw/main/dist/shinylite-py-01.zip</xsl:attribute>
+                    <xsl:attribute name="interactivetype"><xsl:value-of select="@interactivetype"/></xsl:attribute>
+                    <xsl:attribute name="codesrc"><xsl:value-of select="@src"/></xsl:attribute>
+                    <Attachments>
+					    <Attachment>
+                            <xsl:attribute name="name">codesnippet</xsl:attribute>
+                            <xsl:attribute name="src"><xsl:value-of select="@src"/></xsl:attribute>
+                        </Attachment>
+				    </Attachments>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="src">
                         <xsl:value-of select="@src"/>
                     </xsl:attribute>
-                    <xsl:if test="@height">
-                        <xsl:attribute name="height">
-                            <xsl:value-of select="@height"/>
-                        </xsl:attribute>
-                    </xsl:if>
-                    <xsl:if test="@width">
-                        <xsl:attribute name="width">
-                            <xsl:value-of select="@width"/>
-                        </xsl:attribute>
-                    </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>
-            <xsl:apply-templates/>
+            </xsl:choose> <!-- END: test="@codesnippet='True'"-->
+           <xsl:apply-templates/>
         </MediaContent>
     </xsl:template>
 
