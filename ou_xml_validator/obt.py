@@ -101,6 +101,18 @@ def apply_fixes(
 ) -> None:
     """Apply a range of post-processing fixes."""
 
+    def node_repair_MediaContent(node, id=None, h=None, w="600"):
+        """Fix broken MediaContent."""
+        id = node.get("id", None) if id is None else id
+        id = id if id else hack_uuid()
+        h = node.get("height", None) if h is None else h
+        h = h if h else "400"
+        w = node.get("width", None) if w is None else w
+        w = w if w else "600"
+        node.set("id", id)
+        node.set("height", h)
+        node.set("width", w)
+
     def _text_to_htmlzip(text):
         """Write text to index.html then zip it"""
         filename_stub = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}'
@@ -109,7 +121,7 @@ def apply_fixes(
         zipfilepath = Path(source) / "_build" / "ouxml" / zipfilename
         with zipfile.ZipFile(zipfilepath, "w", zipfile.ZIP_DEFLATED) as zf:
             zf.writestr(filename, text)
-        return urljoin(audio_path_prefix, zipfilename)
+        return urljoin(media_path_prefix, zipfilename)
 
     def _text_to_textfile(
         text,
@@ -119,15 +131,15 @@ def apply_fixes(
         filepath = Path(source) / "_build" / "ouxml" / filename
         with open(filepath, "w") as f:
             f.write(text)
-        return urljoin(audio_path_prefix, filename)
+        return urljoin(media_path_prefix, filename)
 
     # Postprocessing required:
     # * Remove non-document cross-links
     image_path_prefix = (
         config["ou"]["image_path_prefix"] if "image_path_prefix" in config["ou"] else ""
     )
-    audio_path_prefix = (
-        config["ou"]["audio_path_prefix"] if "audio_path_prefix" in config["ou"] else ""
+    media_path_prefix = (
+        config["ou"]["media_path_prefix"] if "media_path_prefix" in config["ou"] else ""
     )
 
     if node.tag == "olink":
@@ -220,9 +232,7 @@ def apply_fixes(
             # we can use the OU codesnippet package
             node.tag = "MediaContent"
             node.set("type", "html5")
-            node.set("id", hack_uuid())
-            node.set("height", "100")
-            node.set("width", "*")
+            node_repair_MediaContent(node, h="100", w="*")
             node.set(
                 "src",
                 "https://openuniv.sharepoint.com/sites/modules%E2%80%93shared/imd/widgets/CL/codesnippet/cl_codesnippet_v1.0.zip",
@@ -250,6 +260,7 @@ def apply_fixes(
             node.text = None
             node.append(params)
             node.append(attachments)
+            counters["html5"] += 1
             """
             <MediaContent type="html5" src="https://openuniv.sharepoint.com/sites/modules%E2%80%93shared/imd/widgets/CL/codesnippet/cl_codesnippet_v1.0.zip" height="100" width="*" id="cs4">
 				<Parameters>
@@ -262,7 +273,6 @@ def apply_fixes(
 				</Attachments>
 			</MediaContent>
             """
-
         else:
             # Add paragraphs into block-level computer displays
             lines = etree.tostring(node, encoding=str).strip()
@@ -401,25 +411,32 @@ def apply_fixes(
             copy(image_src, filepath)
             node.attrib["src"] = urljoin(image_path_prefix, filename)
     elif node.tag == "MediaContent":
-        if "codesnippet" in node.attrib:
+        _keep = node.get("keep", "never")
+        if (
+            "codesnippet" in node.attrib
+            or (node.attrib.get("interactivetype") == "Xshinylite-py")
+        ):
+            node_repair_MediaContent(node)
             # We need to copy over the code file
             src = node.get("codesrc")
             _src = Path(source) / src
             suffix = _src.suffix
-            filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}{suffix}'
+            if _keep == "always":
+                filename = _src.name
+            else:
+                filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}{suffix}'
+                counters["html5"] += 1
             filepath = Path(source) / "_build" / "ouxml" / filename
             copy(src, filepath)
-            node.find('.//Attachment[@name="codesnippet"]').attrib["src"] = urljoin(audio_path_prefix, filename)
-            counters["html5"] += 1
-        elif "type" in node.attrib and node.attrib["type"] == "html5":
+            node.find('.//Attachment[@name="codesnippet"]').attrib["src"] = urljoin(
+                media_path_prefix, filename
+            )
+        elif node.attrib.get("type") == "html5":
             # This seems to expect:
             # - id, height and width attributes to be set
             # - a link to a zip file
             # - zip file must contain at least index.html
-            node.set("id", hack_uuid())
-            # node.attrib["id"] = hack_uuid()
-            node.set("height", "400")
-            node.set("width", "600")
+            node_repair_MediaContent(node)
             src = node.get("src")
             if src != "":
                 zip_src = Path(source) / src
@@ -431,12 +448,15 @@ def apply_fixes(
                     #   top_level_files = [f.filename for f in zip_file.filelist if not '/' in f.filename]
                     #   if "index.html" in top_level_files: etc
                     if zip_src.exists():
-                        filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}{suffix}'
+                        if _keep == "always":
+                            filename = Path(zip_src).name
+                        else:
+                            filename = f'{module_code.lower()}_b{block}_p{part}_{presentation.lower()}_html{counters["html5"]}{suffix}'
+                            counters["html5"] += 1
                         filepath = Path(source) / "_build" / "ouxml" / filename
                         filepath.parent.mkdir(parents=True, exist_ok=True)
                         copy(zip_src, filepath)
-                        node.attrib["src"] = urljoin(audio_path_prefix, filename)
-                        counters["html5"] += 1
+                        node.attrib["src"] = urljoin(media_path_prefix, filename)
                 elif suffix in [".html", ".htm"]:
                     # whatever the file, use the content for index.html and zip it
                     # TO DO check path exists?
@@ -459,14 +479,21 @@ def apply_fixes(
                 filepath = Path(source) / "_build" / "ouxml" / filename
                 filepath.parent.mkdir(parents=True, exist_ok=True)
                 copy(media_src, filepath)
-                node.attrib["src"] = urljoin(audio_path_prefix, filename)
+                node.attrib["src"] = urljoin(media_path_prefix, filename)
             else:
                 stdout(f"can't find {media_src}")
             if node.attrib["type"] == "audio":
-                node.attrib["src"] = urljoin(audio_path_prefix, filename)
-        for attr in ["codesnippet", "codesrc", "theme"]:  # Just in case
-           if attr in node.attrib:
-               del node.attrib[attr]
+                node.attrib["src"] = urljoin(media_path_prefix, filename)
+        # TO DO - really should have this to just accept valid attributes...
+        for attr in [
+            "codesnippet",
+            "codesrc",
+            "theme",
+            "keep",
+            "interactivetype",
+        ]:  # Just in case
+            if attr in node.attrib:
+                del node.attrib[attr]
     elif node.tag in ["Activity", "Exercise", "ITQ"]:
         # Wrap the activity content in a Question
         question = None
@@ -477,6 +504,7 @@ def apply_fixes(
                 "Question",
                 "Answer",
                 "Discussion",
+                "Interaction"
             ]:
                 if question is None:
                     question = etree.Element("Question")
