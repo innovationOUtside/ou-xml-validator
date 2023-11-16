@@ -119,7 +119,7 @@
         <!-- <xsl:value-of select="str:replace(text(), '&#xa;', '&#xa;&gt; ')" /> -->
     </xsl:template>
 
-    <!-- TO DO - nested lists -->
+    <!-- TO DO - subsidiary lists -->
     <xsl:template match="ListItem">
         <!-- <xsl:value-of select="functx:repeat-string('    ', count(ancestor::li))"/> -->
         <xsl:text>&#xa;</xsl:text>
@@ -136,14 +136,13 @@
         <!-- <xsl:apply-templates select="* except (NumberedList|BulletedList)" /> -->
         <xsl:apply-templates />
         <!--<xsl:text>&#xa;</xsl:text>-->
-        <xsl:apply-templates select="NumberedList|BulletedList" />
     </xsl:template>
 
     <!-- Original didn't process text() nodes for these to prevent unnecessary whitespace -->
-    <xsl:template match="NumberedList|BulletedList">
+    <xsl:template match="NumberedList|BulletedList|UnNumberedList|SubsidiaryNumberedList|SubsidiaryBulletedList|SubsidiaryUnNumberedList">
+        <!-- TO DO - subsidiary lists -->
         <xsl:apply-templates />
     </xsl:template>
-
 
     <!-- OU-XML things -->
 
@@ -474,6 +473,20 @@ jupyter:
     </xsl:template>
 
 
+    <xsl:template match="Interaction">
+        <xsl:text>&#xa;&#xa;```{ou-interaction}&#xa;</xsl:text>
+            <xsl:apply-templates />
+        <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="FreeResponse">
+        <xsl:text>:type: freeresponse&#xa;</xsl:text>
+        <xsl:if test="@size='paragraph' or @size='single line' or @size='long' or @size='formatted'">
+            <xsl:text>&#xa;:size:</xsl:text>
+                <xsl:value-of select="@size" />
+                <xsl:text>&#xa;</xsl:text>
+        </xsl:if>
+    </xsl:template>
     <!-- TO DO -->
 
     <!-- is there a transcript element? -->
