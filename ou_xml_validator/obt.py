@@ -412,9 +412,8 @@ def apply_fixes(
             node.attrib["src"] = urljoin(image_path_prefix, filename)
     elif node.tag == "MediaContent":
         _keep = node.get("keep", "never")
-        if (
-            "codesnippet" in node.attrib
-            or (node.attrib.get("interactivetype") == "Xshinylite-py")
+        if "codesnippet" in node.attrib or (
+            node.attrib.get("interactivetype") == "Xshinylite-py"
         ):
             node_repair_MediaContent(node)
             # We need to copy over the code file
@@ -504,7 +503,7 @@ def apply_fixes(
                 "Question",
                 "Answer",
                 "Discussion",
-                "Interaction"
+                "Interaction",
             ]:
                 if question is None:
                     question = etree.Element("Question")
