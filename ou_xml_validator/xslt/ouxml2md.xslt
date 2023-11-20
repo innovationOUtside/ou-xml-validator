@@ -48,13 +48,13 @@
     </xsl:template>
 
  <!-- Strip whitespace in the emphasis tags-->
-  <xsl:template match="b/text()">
+ <!-- <xsl:template match="b/text()">
     <xsl:value-of select="normalize-space(.)"/>
   </xsl:template>
   <xsl:template match="i/text()">
     <xsl:value-of select="normalize-space(.)"/>
   </xsl:template>
-
+-->
    <!--- <xsl:template match="Paragraph/br">
         <xsl:text>&#xa;&#xa;</xsl:text>
     </xsl:template> -->
@@ -565,44 +565,17 @@ jupyter:
     </xsl:template>
 
     <xsl:template match="MediaContent">
-        <xsl:comment>MEDIACONTENT</xsl:comment>
-        <xsl:apply-templates />
-        <xsl:comment>ENDMEDIACONTENT</xsl:comment>
-    </xsl:template>
-
-    <xsl:template match="MediaContent[@type = 'video']">
         <xsl:choose>
-            <xsl:when test="$myst = 'True'">
-                <xsl:text>&#xa;&#xa;```{ou-video} </xsl:text>
+            <xsl:when test="@type = 'video' or @type = 'audio'">
+                <xsl:text>&#xa;&#xa;```{ou-</xsl:text><xsl:value-of select="@type" /><xsl:text>} </xsl:text>
                 <xsl:value-of select="@src" />
-                <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <video>
-                    <xsl:attribute name="width">80%</xsl:attribute>
-                    <xsl:attribute name="download" />
-                    <source src='{str:split(@src, "\\")[last()]}' type="video/mp4"></source>
-                </video>
-            </xsl:otherwise>
-        </xsl:choose>
-        <xsl:apply-templates />
-    </xsl:template>
-
-    <xsl:template match="MediaContent[@type = 'audio']">
-        <xsl:choose>
-            <xsl:when test="$myst = 'True'">
-                <xsl:text>&#xa;&#xa;```{ou-audio} </xsl:text>
-                <xsl:value-of select="@src" />
+                <xsl:if test="@height"><xsl:text>&#xa;:height: </xsl:text><xsl:value-of select="@height" /></xsl:if>
+                <xsl:if test="@width"><xsl:text>&#xa;:width: </xsl:text><xsl:value-of select="@width" /></xsl:if>
                 <xsl:apply-templates />
                 <xsl:text>&#xa;```&#xa;&#xa;</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-                <audio>
-                    <xsl:attribute name="width">80%</xsl:attribute>
-                    <xsl:attribute name="download" />
-                    <source src='{str:split(@src, "\\")[last()]}' type="video/mp4"></source>
-                    <xsl:apply-templates />
-                </audio>
+                <xsl:text>SOMETHING ELSE 2</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
