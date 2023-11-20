@@ -2,9 +2,11 @@
 
 Command-line tools for transforming and validating OU-XML. Tools include:
 
-- generating Markdown/MyST Markdown from OU-XML
-- genrating OU-XML from Markdown/MyST Markdown
+- generating Markdown/MyST Markdown from OU-XML (*ouxml2myst*)
+- generating OU-XML from Markdown/MyST Markdown via SphinxXML (*myst2sphinxXML* followed by *sphinxXml2ouxml*)
 - validating OU-XML
+
+A demo VLE site that renders OU-XML generated from MyST markdown is available [here](https://learn2.open.ac.uk/course/view.php?id=220999) (OU Staff only; please email `tony.hirst@open.ac.uk` for access).
 
 Install as:
 
@@ -30,9 +32,9 @@ ou_xml_validator cleanmd PATH
 jupytext --to myst src/*.md
 ```
 
-## Transforming Markdown/Must Markdown to OU-XML
+## Transforming Markdown/MyST Markdown to OU-XML
 
-Extending a tool originally developed by Mark Hall, transform Sphinx XML generated from markdown files described by `_toc.yml` and configured using `_config.yml`to OU-XML. Admonition extensions in the original markdown can be trasnformed using the [`innovationOUtside/sphinxcontrib-ou-xml-tags`](https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags) Sphinx plugin.
+Inspired by a tool originally developed by Mark Hall, transform Sphinx XML generated from markdown files described by `_toc.yml` and configured using `_config.yml`to OU-XML. Admonition extensions in the original markdown can be trasnformed using the [`innovationOUtside/sphinxcontrib-ou-xml-tags`](https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags) Sphinx plugin.
 
 ```bash
 # Use Jupyter Book tools to generate Sphinx XML
@@ -80,6 +82,8 @@ Install as:
 
 ## TESTING
 
-Tests in progress...
+Tests in progress... These are a bit congrived and hacked, with a view mainly of checking some sort of XML and MyST equivalence to support a goal of round-tripping.
 
-pytest 
+More "exact" tests are needed e.g. for checking small atomic element transformations exactly.
+
+Run as: `pytest` or `pytest -v`

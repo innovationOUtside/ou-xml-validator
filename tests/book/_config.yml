@@ -1,0 +1,13 @@
+sphinx:
+  extra_extensions:
+    #- sphinxcontrib.mermaid
+    #- sphinx_exercise
+    #- sphinxcontrib.youtube
+    - sphinxcontrib.ou-video
+    - sphinxcontrib.ou-audio
+    - sphinxcontrib.ou-html5
+    - sphinxcontrib.ou-mol3d
+    - sphinxcontrib.ou-codestyle
+    - sphinxcontrib.ou-activities
+
+only_build_toc_files: true
