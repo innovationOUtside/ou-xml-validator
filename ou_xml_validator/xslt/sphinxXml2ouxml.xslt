@@ -12,7 +12,7 @@
         <Title><xsl:apply-templates/></Title>
     </xsl:template>
     <xsl:template match="title">
-        <Heading><xsl:apply-templates/></Heading>
+        <Heading><xsl:value-of select="normalize-space(.)"/></Heading>
     </xsl:template>
 
     <!-- Paragraph templates -->
@@ -188,10 +188,10 @@
         <Activity><xsl:apply-templates/></Activity>
     </xsl:template>
     <xsl:template match="container[@design_component = 'ou-activity-title']">
-        <Heading><xsl:apply-templates/></Heading>
+        <Heading><xsl:value-of select="normalize-space(.)"/></Heading>
     </xsl:template>
     <xsl:template match="container[@design_component = 'ou-time']">
-        <Timing><xsl:apply-templates/></Timing>
+        <Timing><xsl:value-of  select="normalize-space(.)"/></Timing>
     </xsl:template>
     <xsl:template match="container[@design_component = 'ou-activity-answer']">
         <Answer><xsl:apply-templates/></Answer>
@@ -237,7 +237,7 @@
         </Exercise>
     </xsl:template>
     <xsl:template match="container[@design_component = 'ou-title']">
-        <Heading><xsl:apply-templates/></Heading>
+        <Heading><xsl:value-of select="normalize-space(.)"/></Heading>
     </xsl:template>
     <xsl:template match="container[@design_component = 'ou-answer']">
         <Answer><xsl:apply-templates/></Answer>
@@ -458,6 +458,9 @@
     </xsl:template>
     <!-- Remove unwanted target tag as generated in Sphinx XML -->
     <xsl:template match="target"></xsl:template>
+
+    <!-- Strip whitespace-only text nodes -->
+    <xsl:strip-space elements="container"/>
 
     <xsl:template match="*">
         <UnknownTag><xsl:value-of select="name(.)"/></UnknownTag>

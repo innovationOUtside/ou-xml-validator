@@ -185,23 +185,24 @@
         <!-- <exsl:document method="html" href="{$filestub}_{count(../preceding-sibling::node())}_{position()}.md"> -->
         <exsl:document method="html" href="{$filestub}_{format-number(count(../preceding-sibling::Unit),'00')}_{format-number(count(preceding-sibling::Session)+1,'00')}.md">
 <xsl:text>---
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.11.4
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.16.0
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
 ---&#xa;&#xa;</xsl:text>
             <xsl:apply-templates />
         </exsl:document>
     </xsl:template>
 
     <xsl:template match="Section">
+    <xsl:text>&#xa;&#xa;%%%%%%&#xa;&#xa;</xsl:text>
+    <xsl:text></xsl:text>
         <xsl:apply-templates />
     </xsl:template>
 
@@ -224,11 +225,13 @@ jupyter:
     </xsl:template>
 
     <xsl:template match="SubSection">
-        <xsl:text>&#xa;&#xa;---&#xa;&#xa;</xsl:text>
+    <xsl:text>&#xa;&#xa;%%%%%%&#xa;&#xa;</xsl:text>
+        <xsl:text>&#xa;&#xa;--&#xa;&#xa;</xsl:text>
         <xsl:apply-templates />
     </xsl:template>
 
     <xsl:template match="SubSubSection">
+    <xsl:text>&#xa;&#xa;%%%%%%&#xa;&#xa;</xsl:text>
         <xsl:text>&#xa;&#xa;---&#xa;&#xa;</xsl:text>
         <xsl:apply-templates />
     </xsl:template>

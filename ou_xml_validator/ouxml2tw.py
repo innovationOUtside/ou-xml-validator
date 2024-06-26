@@ -61,10 +61,10 @@ def apply_xml_fixes(
         )
 
 
-def transform_xml2md(xml, config, xslt="templates/ouxml2myst.xslt", output_path_stub=""):
+def transform_xml2tw(xml, config, xslt="templates/ouxml2tiddlywiki.xslt", output_path_stub=""):
     """Take an OU-XML document as a string
-    and transform the document to one or more markdown files."""
-    subconfig = config.get("ou", {}).get("ouxml2md", {})
+    and transform the document to tiddlywiki files."""
+    subconfig = config.get("ou", {}).get("ouxml2tw", {})
     subconfig["code_lang"] = subconfig.get("code_lang", DEFAULT_LANG)
     myst = subconfig.get("myst", True)
     # TO DO  - the stylesheet should depend on the md flavour
@@ -104,7 +104,7 @@ def transform_xml2md(xml, config, xslt="templates/ouxml2myst.xslt", output_path_
 def convert_to_markdown(
     source: str,
     config: str = "./_config.yml",
-    xslt: str = "xslt/ouxml2myst.xslt",
+    xslt: str = "xslt/ouxml2tw.xslt",
     output_path_stub: str = "",
     regenerate: bool = False,
     numbering_from: int = 1,
@@ -121,14 +121,14 @@ def convert_to_markdown(
         # If it's a directory, process each file in the directory
         #
         for file_path in source.glob("*.xml"):
-            transform_xml2md(
+            transform_xml2tw(
                 file_path,
                 config,
                 xslt=xslt,
                 output_path_stub=f"{output_path_stub}{file_path.stem}",
             )
     else:
-        transform_xml2md(source, config, xslt=xslt, output_path_stub=output_path_stub)
+        transform_xml2tw(source, config, xslt=xslt, output_path_stub=output_path_stub)
 
 
 def main():

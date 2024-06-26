@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 import pkg_resources
 
+
 # If it looks like the file is down a directory path, make sure the path is there
 # If it isn't, the XSLT won't work when it tries to write the output files...
 def check_outdir(output_path_stub):
@@ -15,25 +16,29 @@ def check_outdir(output_path_stub):
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
 
+
 def get_file(fn):
     """Get file content from local store."""
     # This should work locally or in package
-    try:
-        fn = pkg_resources.resource_filename(__name__, fn)
+    if Path(fn).is_file():
         txt = open(fn).read()
-    except:
-        txt = open(fn).read()
+    else:
+        try:
+            fn = pkg_resources.resource_filename(__name__, fn)
+            txt = open(fn).read()
+        except:
+            txt = None
     return txt
 
 
 def transform_xml2md(xml, xslt=None, output_path_stub=""):
-    """Take an OU-XML document as a string 
-       and transform the document to one or more markdown files."""
+    """Take an OU-XML document as a string
+    and transform the document to one or more markdown files."""
     if xslt is None:
-        xslt = "xslt/ouxml2md.xslt"
- 
-    if xml.endswith('.xml') and Path(xml).is_file():
-        with open(xml, 'r') as f:
+        xslt = "xslt/ouxml2myst.xslt"
+
+    if xml.endswith(".xml") and Path(xml).is_file():
+        with open(xml, "r") as f:
             xml = f.read()
 
     check_outdir(output_path_stub)
