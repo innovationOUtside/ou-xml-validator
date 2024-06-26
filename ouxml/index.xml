@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Item TextType="CompleteItem" SchemaVersion="2.0" id="X_ouseful-demo-ou-xml_b0_x" Template="Generic_A4_Unnumbered" Rendering="VLE2 modules (learn2)" DiscussionAlias="Comment" vleglossary="auto">
+  <meta content="OUSEFUL-DEMO-OU-XML 0: Installation"/>
+  <CourseCode>OUSEFUL-DEMO-OU-XML</CourseCode>
+  <CourseTitle>ou-xml-validator</CourseTitle>
+  <ItemID/>
+  <ItemTitle>OUSEFUL-DEMO-OU-XML 0: Installation</ItemTitle>
+  <FrontMatter>
+    <ByLine>Tony Hirst</ByLine>
+    <Imprint>
+        <Standard>
+            <GeneralInfo>
+                <Paragraph>This publication forms part of the Open University module OUSEFUL-DEMO-OU-XML ou-xml-validator. [The complete list of texts which make up this module can be found at the back (where applicable)]. Details of this and other Open University modules can be obtained from the Student Registration and Enquiry Service, The Open University, PO Box 197, Milton Keynes MK7 6BJ, United Kingdom (tel. +44 (0)845 300 60 90; email general-enquiries@open.ac.uk).</Paragraph>
+                <Paragraph>Alternatively, you may visit the Open University website at www.open.ac.uk where you can learn more about the wide range of modules and packs offered at all levels by The Open University.</Paragraph>
+                <Paragraph>To purchase a selection of Open University materials visit www.ouw.co.uk, or contact Open University Worldwide, Walton Hall, Milton Keynes MK7 6AA, United Kingdom for a brochure (tel. +44 (0)1908 858793; fax +44 (0)1908 858787; email ouw-customer-services@open.ac.uk).</Paragraph>
+            </GeneralInfo>
+            <Address>
+                <AddressLine>The Open University,</AddressLine>
+                <AddressLine>Walton Hall, Milton Keynes</AddressLine>
+                <AddressLine>MK7 6AA</AddressLine>
+            </Address>
+            <FirstPublished>
+                <Paragraph>First published 2024</Paragraph>
+            </FirstPublished>
+            <Copyright>
+                <Paragraph>Unless otherwise stated, copyright © 2024 The Open University, all rights reserved.</Paragraph>
+            </Copyright>
+            <Rights>
+                <Paragraph>All rights reserved. No part of this publication may be reproduced, stored in a retrieval system, transmitted or utilised in any form or by any means, electronic, mechanical, photocopying, recording or otherwise, without written permission from the publisher or a licence from the Copyright Licensing Agency Ltd. Details of such licences (for reprographic reproduction) may be obtained from the Copyright Licensing Agency Ltd, Saffron House, 6-10 Kirby Street, London EC1N 8TS (website www.cla.co.uk).</Paragraph>
+                <Paragraph>Open University materials may also be made available in electronic formats for use by students of the University. All rights, including copyright and related rights and database rights, in electronic materials and their contents are owned by or licensed to The Open University, or otherwise used by The Open University as permitted by applicable law.</Paragraph>
+                <Paragraph>In using electronic materials and their contents you agree that your use will be solely for the purposes of following an Open University course of study or otherwise as licensed by The Open University or its assigns.</Paragraph>
+                <Paragraph>Except as permitted above you undertake not to copy, store in any medium (including electronic storage or use in a website), distribute, transmit or retransmit, broadcast, modify or show in public such electronic materials in whole or in part without the prior written consent of The Open University or in accordance with the Copyright, Designs and Patents Act 1988.</Paragraph>
+            </Rights>
+            <Edited>
+                <Paragraph>Edited and designed by The Open University.</Paragraph>
+            </Edited>
+            <Typeset>
+                <Paragraph>Typeset by The Open University</Paragraph>
+            </Typeset>
+            <Printed>
+                <Paragraph>Printed and bound in the United Kingdom by [name and address of the printer].</Paragraph>
+                <Paragraph/>
+            </Printed>
+            <ISBN>None</ISBN>
+            <Edition>None</Edition>
+        </Standard>
+    </Imprint>
+</FrontMatter>
+  <Unit>
+    <UnitID>0: Installation</UnitID>
+    <UnitTitle>OUSEFUL-DEMO-OU-XML 0: Installation</UnitTitle>
+    <ByLine>Tony Hirst</ByLine>
+    <Session id="installation">
+        <Title>1 Installation</Title>
+        <Paragraph>Install as:</Paragraph>
+        <Paragraph><ComputerCode>pip install https://github.com/innovationOUtside/ou-xml-validator/archive/refs/heads/main.zip</ComputerCode></Paragraph>
+        <Paragraph>or</Paragraph>
+        <Paragraph><ComputerCode>pip install git+https://github.com/innovationOUtside/ou-xml-validator.git</ComputerCode></Paragraph>
+    </Session>
+    <Session id="ou-xml-validator">
+        <Title>2 OU-XML Validator</Title>
+        <Paragraph>Simple tool to validate OU-XML files.</Paragraph>
+        <Paragraph>To validate a single file:</Paragraph>
+        <Paragraph><ComputerCode>ou_xml_validator validate path-to-file/testme.xml</ComputerCode></Paragraph>
+        <ProgramListing><Paragraph>Usage: ou_xml_validator [OPTIONS] COMMAND [ARGS]...<br/><br/>Options:<br/>  --help  Show this message and exit.<br/><br/>Commands:<br/>  validate  Validate OU-XML document against OU-XML schema.</Paragraph></ProgramListing>
+        <ProgramListing><Paragraph>Usage: ou_xml_validator validate [OPTIONS] [PATH]<br/><br/>  Validate OU-XML document against OU-XML schema.<br/><br/>Options:<br/>  -s, --schema TEXT  XML schema filepath<br/>  --help             Show this message and exit.</Paragraph></ProgramListing>
+    </Session>
+    <Session id="transforming-ou-xml-to-markdown-myst">
+        <Title>3 Transforming OU-XML to Markdown/MyST</Title>
+        <Paragraph>An XSLT based transformation for transforming a single OU-XML file to one or more markdown files. <i>A post-processor script then cleans and formats the generated markdown.</i></Paragraph>
+        <Paragraph><ComputerCode>ou_xml_validator transform path-to-file/content.xml</ComputerCode></Paragraph>
+        <Paragraph>We can clean the markdown as follows:</Paragraph>
+        <ProgramListing><Paragraph># pip3 install mdformat mdformat-myst</Paragraph><Paragraph>mdformat src </Paragraph><Paragraph>ou_xml_validator cleanmd PATH</Paragraph><Paragraph># If it's simple markdown, transform to myst</Paragraph><Paragraph>jupytext --to myst src/*.md</Paragraph></ProgramListing>
+    </Session>
+    <Session id="transforming-markdown-myst-markdown-to-ou-xml">
+        <Title>4 Transforming Markdown/MyST Markdown to OU-XML</Title>
+        <Paragraph>Inspired by a tool originally developed by Mark Hall, transform Sphinx XML generated from markdown files described by <ComputerCode>_toc.yml</ComputerCode> and configured using <ComputerCode>_config.yml</ComputerCode>to OU-XML. Admonition extensions in the original markdown can be trasnformed using the <a href="https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags"><ComputerCode>innovationOUtside/sphinxcontrib-ou-xml-tags</ComputerCode></a> Sphinx plugin.</Paragraph>
+        <ProgramListing><Paragraph># Use Jupyter Book tools to generate Sphinx XML</Paragraph><Paragraph>jb build . --builder custom --custom-builder xml</Paragraph><Paragraph># Transform Sphinx XML to OU-XML</Paragraph><Paragraph>ouseful_obt .</Paragraph><Paragraph># The resulting XML should be checked using the OU-XML validator.</Paragraph></ProgramListing>
+    </Session>
+    <Session id="transforming-ou-xml-to-tiddlywiki">
+        <Title>5 Transforming OU-XML to TiddlyWiki</Title>
+        <Paragraph>Proof of concept: convert a single OU-XML file to a Tiddlywiki format.</Paragraph>
+    </Session>
+    <BackMatter/>
+  </Unit>
+</Item>

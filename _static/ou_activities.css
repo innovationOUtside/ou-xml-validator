@@ -1,0 +1,80 @@
+/* Imported via Mark Hall, ou-book-theme; copy here for reference. */
+
+:root {
+    --ou-color-activity: 98, 191, 178;
+}
+.ou-activity {
+    margin: 1.5625em auto;
+    padding: 0 .6rem .8rem;
+    overflow: hidden;
+    page-break-inside: avoid;
+    border-left: .2rem solid;
+    border-left-color: rgba(var(--ou-color-activity),1);
+    border-bottom-color: rgba(var(--pst-color-admonition-default),1);
+    border-right-color: rgba(var(--pst-color-admonition-default),1);
+    border-top-color: rgba(var(--pst-color-admonition-default),1);
+    border-radius: .2rem;
+    box-shadow: 0 .2rem .5rem rgba(0,0,0,.05),0 0 .0625rem rgba(0,0,0,.1);
+    transition: color .25s,background-color .25s,border-color .25s;
+
+    .ou-activity-title {
+        position: relative;
+        margin: 0 -.6rem;
+        padding: .4rem .6rem .4rem 2rem;
+        font-weight: 700;
+        background-color: rgba(var(--ou-color-activity),.1);
+
+        &::before {
+            position: absolute;
+            left: .6rem;
+            width: 1rem;
+            height: 1rem;
+            color: rgba(var(--ou-color-activity),1);
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            content: '\f11c';
+        }
+    }
+
+    .ou-activity-title + * {
+        margin-top: .4rem;
+    }
+
+    .ou-activity-title ~ * {
+        margin-left: 1.4rem;
+        margin-right: 1.4rem;
+    }
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+
+
+.ou-activity-answer-content {
+    display: block;
+    background-color: #e6f3ff;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.ou-activity-answer-content.ou-hidden {
+    display: none;
+}
+
+.ou-toggle .ou-toggle-hide {
+    display: none;
+}
+
+.ou-toggle .ou-toggle-show {
+    display: inline;
+}
+
+.ou-toggle:not(.ou-toggle-hidden) .ou-toggle-show {
+    display: none;
+}
+
+.ou-toggle:not(.ou-toggle-hidden) .ou-toggle-hide {
+    display: inline;
+}
+
+}
