@@ -2,7 +2,8 @@
 
 Command-line tools for transforming and validating OU-XML. Tools include:
 
-- generating Markdown/MyST Markdown from OU-XML (*ouxml2myst*)
+- generating Markdown/MyST Markdown from OU-XML (*ouxml2md*)
+- generating TiddlyWiki files from OU-XML
 - generating OU-XML from Markdown/MyST Markdown via SphinxXML (*myst2sphinxXML* followed by *sphinxXml2ouxml*)
 - validating OU-XML
 
@@ -31,6 +32,10 @@ ou_xml_validator cleanmd PATH
 # If it's simple markdown, transform to myst
 jupytext --to myst src/*.md
 ```
+
+## Transforming OU-XML to TiddlyWiki
+
+Proof of concept: convert a single OU-XML file to a Tiddlywiki format.
 
 ## Transforming Markdown/MyST Markdown to OU-XML
 
@@ -82,7 +87,7 @@ Install as:
 
 ## TESTING
 
-Tests in progress... These are a bit congrived and hacked, with a view mainly of checking some sort of XML and MyST equivalence to support a goal of round-tripping.
+Tests in progress... These are a bit contrived and hacked, with a view mainly of checking some sort of XML and MyST equivalence to support a goal of round-tripping.
 
 More "exact" tests are needed e.g. for checking small atomic element transformations exactly.
 
