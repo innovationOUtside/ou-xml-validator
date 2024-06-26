@@ -822,7 +822,11 @@ def convert_to_ouxml(
                 backmatter,
             )
             create_backmatter(unit, config, backmatter)
+
             outfile = Path(output_base) / f"{module_code.lower()}_{block.lower()}.xml"
+            # Create the directory if it doesn't exist
+            if not os.path.exists(os.path.dirname(outfile)):
+                os.makedirs(os.path.dirname(outfile))
             with open(outfile, "wb") as out_f:
                 out_f.write(
                     etree.tostring(
