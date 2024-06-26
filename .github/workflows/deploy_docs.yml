@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install jupyter-book ou-jupyter-book-tools .
-        pip install git+https://github.com/innovationOUtside/ou-xml-validator.git
+        pip install git+https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags.git
     # Build the book
     - name: Build the book
       run: |
