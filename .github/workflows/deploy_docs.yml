@@ -31,7 +31,7 @@ jobs:
         jb build docs --builder custom --custom-builder xml
         ouseful_obt docs
         mkdir -p ./docs/_build/html/ouxml
-        mv ./docs/_build/ouxml/ouseful-demo-ou-xmk_0.xml ./docs/_build/html/ouxml/index.xml 
+        mv ./docs/_build/ouxml/ouseful-demo-ou-xml_0.xml ./docs/_build/html/ouxml/index.xml 
     # Push the book's HTML to github-pages
     - name: GitHub Pages action
       uses: peaceiris/actions-gh-pages@v3.6.1
