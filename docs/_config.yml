@@ -1,4 +1,4 @@
-title: ou0xml-validator examples
+title: ou-xml-validator examples
 author: Tony Hirst
 
 lang: en
@@ -28,7 +28,7 @@ parse:
     - dollarmath
 
 repository:
-  url                       : https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags # Online location of your book
+  url                       : https://github.com/innovationOUtside/ou-xml-validator # Online location of your book
   path_to_book              : docs  # Optional path to your book, relative to the repository root
   branch                    : main
 
