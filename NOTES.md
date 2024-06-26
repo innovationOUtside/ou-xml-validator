@@ -4,10 +4,9 @@ Various notes and observations on the translation process. The sort of thing tha
 
 ## Formatting
 
-The conversion utililities process and generate MyST markdown formatted using the opinionated [`mdformat`](https://github.com/executablebooks/mdformat) formatter and several `mdformat` plugins:
+The conversion utilities process and generate MyST markdown formatted using the opinionated [`mdformat`](https://github.com/executablebooks/mdformat) formatter and several `mdformat` plugins:
 
 `pip3 install mdformat mdformat-myst mdformat-tables mdformat-web`
-
 
 ## Converting executed notebooks to markdown
 
@@ -144,7 +143,7 @@ In particular, note that:
 - code cells are `{code-cell}` admonition blocks;
 - code cell tags are cell block attributes: `:tags: [style-activity]`
 
-For collapsed cells, in the line before a collapsed header we add a cell beak: `+++ {"heading_collapsed": true}`. Under a collapsed header, the markdown and code cells are tagged as *hidden* (`+++ {"hidden": true}` and `:hidden: true` respectively).
+For collapsed cells, in the line before a collapsed header we add a cell break: `+++ {"heading_collapsed": true}`. Under a collapsed header, the markdown and code cells are tagged as *hidden* (`+++ {"hidden": true}` and `:hidden: true` respectively).
 
 A markdown cell break (`+++`) inserts a comment into the SphinxXML of the form `<comment classes="block_break" xml:space="preserve"></comment>`.
 
@@ -160,7 +159,7 @@ Non-executable code in a markdown block is rendered to Sphinx-XML as a `<literal
 </literal_block>
 ```
 
-But a code cell's mapping is more elaborate, into a container with an embedded continer for the input:
+But a code cell's mapping is more elaborate, into a container with an embedded container for the input:
 
 ```xml
             <container cell_index="1" cell_metadata="{'tags': ['hide-input']}" classes="cell tag_hide-input" exec_count="True" hide_mode="input" nb_element="cell_code" prompt_hide="Hide code cell {type}" prompt_show="Show code cell {type}">
@@ -208,6 +207,7 @@ Currently, only text outputs make it into the Sphinx-XML. To embed an output ima
 
 ## Converting SphinxXML to OU-XML
 
+We can programmatically convert SphinxXML to OU-XML as follows:
 
 ```python
 from ou_xml_validator.utils import apply_xslt
