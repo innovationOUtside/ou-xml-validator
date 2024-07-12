@@ -82,16 +82,16 @@
         <Paragraph>We can generate interactive mindmap and treemap views over the navigational heading structure of an OU-XML document:</Paragraph>
         <BulletedList>
             <ListItem>
-                <Paragraph>interactive mindmap view (using <a href="https://jsmind.online/#sample">jsmind</a>):</Paragraph>
+                <Paragraph>interactive mindmap view — <UnknownTag>download_reference</UnknownTag> — (using <a href="https://jsmind.online/#sample">jsmind</a>):</Paragraph>
             </ListItem>
         </BulletedList>
-        <Figure><Image src="docs/images/mindmap.png"/></Figure>
+        <Figure><Image src="https://raw.githubusercontent.com/innovationOUtside/ou-xml-validator/main/vletmp/ouseful-demo-ou-xml_b0_p1_x_fig1.png"/></Figure>
         <BulletedList>
             <ListItem>
-                <Paragraph>interactive treemap view (<a href="https://plotly.com/python/treemaps/">plotly treemap</a>: note that the text layout is a bit dodgy!)</Paragraph>
+                <Paragraph>interactive treemap view — <UnknownTag>download_reference</UnknownTag> — (<a href="https://plotly.com/python/treemaps/">plotly treemap</a>: note that the text layout is a bit dodgy!)</Paragraph>
             </ListItem>
         </BulletedList>
-        <Figure><Image src="docs/images/treemap.png"/></Figure>
+        <Figure><Image src="https://raw.githubusercontent.com/innovationOUtside/ou-xml-validator/main/vletmp/ouseful-demo-ou-xml_b0_p1_x_fig2.png"/></Figure>
         <Paragraph>Use the <ComputerCode>--use_treemap</ComputerCode>/<ComputerCode>-t</ComputerCode>switch to generate treemap files.</Paragraph>
         <Paragraph>Examples:</Paragraph>
         <Paragraph><ComputerCode>ouseful_ouxml2mm Downloads/tm129_24j-week*.xml -m TM129 -t</ComputerCode></Paragraph>
