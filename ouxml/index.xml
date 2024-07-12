@@ -52,7 +52,9 @@
     <ByLine>Tony Hirst</ByLine>
     <Session id="installation">
         <Title>1 Installation</Title>
-        <Paragraph>Install as:</Paragraph>
+        <Paragraph>Install latest release from PyPi:</Paragraph>
+        <Paragraph><ComputerCode>pip install ou-xml-validator</ComputerCode></Paragraph>
+        <Paragraph>Install latest develepment version as:</Paragraph>
         <Paragraph><ComputerCode>pip install https://github.com/innovationOUtside/ou-xml-validator/archive/refs/heads/main.zip</ComputerCode></Paragraph>
         <Paragraph>or</Paragraph>
         <Paragraph><ComputerCode>pip install git+https://github.com/innovationOUtside/ou-xml-validator.git</ComputerCode></Paragraph>
