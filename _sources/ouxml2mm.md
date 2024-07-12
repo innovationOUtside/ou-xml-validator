@@ -2,11 +2,11 @@
 
 We can generate interactive mindmap and treemap views over the navigational heading structure of an OU-XML document:
 
-- interactive mindmap view — [example](./examples/TM129_mm.html) — (using [jsmind](https://jsmind.online/#sample)):
+- interactive mindmap view — [example](https://innovationoutside.github.io/ou-xml-validator/examples/TM129_mm.html) — (using [jsmind](https://jsmind.online/#sample)):
 
 ![Example module treemap (partial)](images/mindmap.png)
 
-- interactive treemap view — [example](./examples/TM129_tm.html) — ([plotly treemap](https://plotly.com/python/treemaps/): note that the text layout is a bit dodgy!)
+- interactive treemap view — [example](https://innovationoutside.github.io/ou-xml-validator/examples/TM129_tm.html) — ([plotly treemap](https://plotly.com/python/treemaps/): note that the text layout is a bit dodgy!)
 
 ![Example module treemap (partial)](images/treemap.png)
 
