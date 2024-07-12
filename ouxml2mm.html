@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>ou-xml-validator package &#8212; ou-xml-validator examples</title>
+    <title>Interactive Mindmap and Treemap Views &#8212; ou-xml-validator examples</title>
   
   
   
@@ -60,10 +60,11 @@
     <script src="_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'ouxml2mm';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="install.html" />
+    <link rel="next" title="Transforming OU-XML to TiddlyWiki" href="ouxml2tiddlywiki.html" />
+    <link rel="prev" title="Transforming Markdown/MyST Markdown to OU-XML" href="mdmyst2ouxml.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -126,8 +127,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -146,7 +145,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="index.html">
   
   
   
@@ -171,18 +170,18 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
                     ou-xml-validator package
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="validator.html">OU-XML Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ouxml2myst.html">Transforming OU-XML to Markdown/MyST</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mdmyst2ouxml.html">Transforming Markdown/MyST Markdown to OU-XML</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ouxml2mm.html">Interactive Mindmap and Treemap Views</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Interactive Mindmap and Treemap Views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ouxml2tiddlywiki.html">Transforming OU-XML to TiddlyWiki</a></li>
 </ul>
 
@@ -238,7 +237,7 @@
       
       
       
-      <li><a href="_sources/index.md" target="_blank"
+      <li><a href="_sources/ouxml2mm.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -320,7 +319,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>ou-xml-validator package</h1>
+    <h1>Interactive Mindmap and Treemap Views</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -334,18 +333,21 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="ou-xml-validator-package">
-<h1><code class="docutils literal notranslate"><span class="pre">ou-xml-validator</span></code> package<a class="headerlink" href="#ou-xml-validator-package" title="Permalink to this heading">#</a></h1>
-<p>Command-line tools for transforming and validating OU-XML. Tools include:</p>
+  <section id="interactive-mindmap-and-treemap-views">
+<h1>Interactive Mindmap and Treemap Views<a class="headerlink" href="#interactive-mindmap-and-treemap-views" title="Permalink to this heading">#</a></h1>
+<p>We can generate interactive mindmap and treemap views over the navigational heading structure of an OU-XML document:</p>
 <ul class="simple">
-<li><p>generating Markdown/MyST Markdown from OU-XML (<em>ouxml2md</em>)</p></li>
-<li><p>generating TiddlyWiki files from OU-XML (experimental)</p></li>
-<li><p>generating OU-XML from Markdown/MyST Markdown via SphinxXML (<em>myst2sphinxXML</em> followed by <em>sphinxXml2ouxml</em>)</p></li>
-<li><p>validating OU-XML</p></li>
+<li><p>interactive mindmap view (using <a class="reference external" href="https://jsmind.online/#sample">jsmind</a>):</p></li>
 </ul>
-<p>A demo VLE site that renders OU-XML generated from MyST markdown is available <a class="reference external" href="https://learn2.open.ac.uk/course/view.php?id=220999">here</a> (OU Staff only; please email <code class="docutils literal notranslate"><span class="pre">tony.hirst&#64;open.ac.uk</span></code> for access).</p>
-<div class="toctree-wrapper compound">
-</div>
+<p><img alt="Example module treemap (partial)" src="docs/images/mindmap.png" /></p>
+<ul class="simple">
+<li><p>interactive treemap view (<a class="reference external" href="https://plotly.com/python/treemaps/">plotly treemap</a>: note that the text layout is a bit dodgy!)</p></li>
+</ul>
+<p><img alt="Example module treemap (partial)" src="docs/images/treemap.png" /></p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">--use_treemap</span></code>/<code class="docutils literal notranslate"><span class="pre">-t</span></code>switch to generate treemap files.</p>
+<p>Examples:</p>
+<p><code class="docutils literal notranslate"><span class="pre">ouseful_ouxml2mm</span> <span class="pre">Downloads/tm129_24j-week*.xml</span> <span class="pre">-m</span> <span class="pre">TM129</span> <span class="pre">-t</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">ouseful_ouxml2mm</span> <span class="pre">Downloads/tm129_24j-week1.xml</span> <span class="pre">Downloads/tm129_24j-week2.xml</span></code></p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -378,12 +380,21 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="mdmyst2ouxml.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Transforming Markdown/MyST Markdown to OU-XML</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="install.html"
+       href="ouxml2tiddlywiki.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
+        <p class="prev-next-title">Transforming OU-XML to TiddlyWiki</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

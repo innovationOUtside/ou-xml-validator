@@ -77,8 +77,28 @@
         <Paragraph>Inspired by a tool originally developed by Mark Hall, transform Sphinx XML generated from markdown files described by <ComputerCode>_toc.yml</ComputerCode> and configured using <ComputerCode>_config.yml</ComputerCode>to OU-XML. Admonition extensions in the original markdown can be trasnformed using the <a href="https://github.com/innovationOUtside/sphinxcontrib-ou-xml-tags"><ComputerCode>innovationOUtside/sphinxcontrib-ou-xml-tags</ComputerCode></a> Sphinx plugin.</Paragraph>
         <ProgramListing><Paragraph># Use Jupyter Book tools to generate Sphinx XML</Paragraph><Paragraph>jb build . --builder custom --custom-builder xml</Paragraph><Paragraph># Transform Sphinx XML to OU-XML</Paragraph><Paragraph>ouseful_obt .</Paragraph><Paragraph># The resulting XML should be checked using the OU-XML validator.</Paragraph></ProgramListing>
     </Session>
+    <Session id="interactive-mindmap-and-treemap-views">
+        <Title>5 Interactive Mindmap and Treemap Views</Title>
+        <Paragraph>We can generate interactive mindmap and treemap views over the navigational heading structure of an OU-XML document:</Paragraph>
+        <BulletedList>
+            <ListItem>
+                <Paragraph>interactive mindmap view (using <a href="https://jsmind.online/#sample">jsmind</a>):</Paragraph>
+            </ListItem>
+        </BulletedList>
+        <Figure><Image src="docs/images/mindmap.png"/></Figure>
+        <BulletedList>
+            <ListItem>
+                <Paragraph>interactive treemap view (<a href="https://plotly.com/python/treemaps/">plotly treemap</a>: note that the text layout is a bit dodgy!)</Paragraph>
+            </ListItem>
+        </BulletedList>
+        <Figure><Image src="docs/images/treemap.png"/></Figure>
+        <Paragraph>Use the <ComputerCode>--use_treemap</ComputerCode>/<ComputerCode>-t</ComputerCode>switch to generate treemap files.</Paragraph>
+        <Paragraph>Examples:</Paragraph>
+        <Paragraph><ComputerCode>ouseful_ouxml2mm Downloads/tm129_24j-week*.xml -m TM129 -t</ComputerCode></Paragraph>
+        <Paragraph><ComputerCode>ouseful_ouxml2mm Downloads/tm129_24j-week1.xml Downloads/tm129_24j-week2.xml</ComputerCode></Paragraph>
+    </Session>
     <Session id="transforming-ou-xml-to-tiddlywiki">
-        <Title>5 Transforming OU-XML to TiddlyWiki</Title>
+        <Title>6 Transforming OU-XML to TiddlyWiki</Title>
         <Paragraph>Proof of concept: convert a single OU-XML file to a Tiddlywiki format.</Paragraph>
     </Session>
     <BackMatter/>
