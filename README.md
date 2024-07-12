@@ -84,6 +84,16 @@ Options:
 
 ## Interactive HTML Mindmap and Treemap views
 
+Generate interactive views over the heading structures of one or more OU-XML files:
+
+- interactive mindmap view (using [jsmind](https://jsmind.online/#sample)):
+
+![Example module treemap (partial)](docs/images/mindmap.png)
+
+- interactive treemap view ([plotly treemap](https://plotly.com/python/treemaps/): note that the text layout is a bit dodgy!)
+
+![Example module treemap (partial)](docs/images/treemap.png)
+
 ```text
 
 Usage: ouseful_ouxml2mm [OPTIONS] SOURCE...                                    
@@ -112,11 +122,7 @@ Usage: ouseful_ouxml2mm [OPTIONS] SOURCE...
 
 You can enter a path to a single HTML file, a directory, or a glob pattern. Files will be further filtered to files with an `.xml` suffix.
 
-![Example module treemap (partial)](docs/images/mindmap.png)
-
-![Example module treemap (partial)](docs/images/treemap.png)
-
-If no filename is entered, filemanes of the form `MODULECODE_xx.html` will be generated where `xx` is replace by `mm` for a mindmap, and `tm` for a treemap.
+If no filename is entered, filenames of the form `MODULECODE_xx.html` will be generated where `xx` is replace by `mm` for a mindmap, and `tm` for a treemap.
 
 Use the `--use_treemap`/`-t`switch to generate treemap files.
 
