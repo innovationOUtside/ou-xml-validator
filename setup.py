@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name="ou_xml_validator",
     packages=["ou_xml_validator"],
-    version="0.0.2",
+    version="0.0.3",
     author="Tony Hirst",
     author_email="tony.hirst@gmail.com",
     description="Simple OU-XML document validator.",
@@ -22,6 +22,7 @@ setup(
         "mdformat-myst",
         "mdformat-tables",
         "mdformat-web",
+        "plotly",
     ],
     package_data={
         "ou_xml_validator": [
@@ -41,5 +42,6 @@ setup(
         ouseful_ouxml2md=ou_xml_validator.ouxml2md:main
         ouseful_ouxml2tw=ou_xml_validator.ouxml2tw:main
         ouseful_ipynb2md=ou_xml_validator.ouxml2md:main
+        ouseful_ouxml2mm=ou_xml_validator.ouxml2mm:main
     """,
 )

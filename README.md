@@ -1,15 +1,20 @@
 # ou-xml-validator
 
-Command-line tools for transforming and validating OU-XML. Tools include:
+Command-line tools for transforming and validating OU-XML, generating alternate views etc. Tools include:
 
 - generating Markdown/MyST Markdown from OU-XML (*ouxml2md*)
-- generating TiddlyWiki files from OU-XML
+- generating TiddlyWiki files from OU-XML (experimental)
 - generating OU-XML from Markdown/MyST Markdown via SphinxXML (*myst2sphinxXML* followed by *sphinxXml2ouxml*)
 - validating OU-XML
+- generating interactive HTMK mindmap and treemap views
 
 A demo VLE site that renders OU-XML generated from MyST markdown is available [here](https://learn2.open.ac.uk/course/view.php?id=220999) (OU Staff only; please email `tony.hirst@open.ac.uk` for access).
 
 Install as:
+
+`pip install ou-xml-validator`
+
+For latest development version:
 
 `pip install https://github.com/innovationOUtside/ou-xml-validator/archive/refs/heads/main.zip`
 
@@ -77,13 +82,61 @@ Options:
   --help             Show this message and exit.
 ```
 
-## BUILD and INSTALL
+## Interactive HTML Mindmap and Treemap views
 
-`python3 -m build`
+```text
+
+Usage: ouseful_ouxml2mm [OPTIONS] SOURCE...                                    
+                                                                                
+ Convert an OU-XML file into markdown.                                          
+                                                                                
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    source      SOURCE...  Source file(s), directory, or glob pattern       │
+│                             [default: None]                                  │
+│                             [required]                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --modulecode          -m      TEXT  Module code [default: MODULE]            │
+│ --output              -o      FILE  Output filename or path/filename         │
+│                                     [default: None]                          │
+│ --use-treemap         -t            Use treemap                              │
+│ --install-completion                Install completion for the current       │
+│                                     shell.                                   │
+│ --show-completion                   Show completion for the current shell,   │
+│                                     to copy it or customize the              │
+│                                     installation.                            │
+│ --help                              Show this message and exit.              │
+╰───────────────
+
+```
+
+You can enter a path to a single HTML file, a directory, or a glob pattern. Files will be further filtered to files with an `.xml` suffix.
+
+![Example module treemap (partial)](docs/images/mindmap.png)
+
+![Example module treemap (partial)](docs/images/treemap.png)
+
+If no filename is entered, filemanes of the form `MODULECODE_xx.html` will be generated where `xx` is replace by `mm` for a mindmap, and `tm` for a treemap.
+
+Use the `--use_treemap`/`-t`switch to generate treemap files.
+
+Examples:
+
+`ouseful_ouxml2mm Downloads/tm129_24j-week*.xml -m TM129 -t`
+
+`ouseful_ouxml2mm Downloads/tm129_24j-week1.xml Downloads/tm129_24j-week2.xml`
+
+## BUILD and INSTALL
 
 Install as:
 
 `python3 -m pip install .`
+
+For PyPi releases:
+
+- build as: `python3 -m build`
+- push to PyPi: `twine upload --skip-existing dist/*`
+
 
 ## TESTING
 
