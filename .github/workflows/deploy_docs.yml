@@ -32,7 +32,7 @@ jobs:
         ouseful_obt docs
         mkdir -p ./docs/_build/html/ouxml
         mv ./docs/_build/ouxml/ouseful-demo-ou-xml_0.xml ./docs/_build/html/ouxml/index.xml 
-        cp ./docs/examples ./docs/_build/html/examples
+        cp -r ./docs/examples ./docs/_build/html/examples
     # Push the book's HTML to github-pages
     - name: GitHub Pages action
       uses: peaceiris/actions-gh-pages@v3.6.1
