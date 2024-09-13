@@ -96,27 +96,28 @@ Generate interactive views over the heading structures of one or more OU-XML fil
 
 ```text
 
-Usage: ouseful_ouxml2mm [OPTIONS] SOURCE...                                    
-                                                                                
- Generate a treemap view over one or more OU-XML files.                                          
-                                                                                
-╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    source      SOURCE...  Source file(s), directory, or glob pattern       │
-│                             [default: None]                                  │
-│                             [required]                                       │
-╰──────────────────────────────────────────────────────────────────────────────╯
-╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --modulecode          -m      TEXT  Module code [default: MODULE]            │
-│ --output              -o      FILE  Output filename or path/filename         │
-│                                     [default: None]                          │
-│ --use-treemap         -t            Use treemap                              │
-│ --install-completion                Install completion for the current       │
-│                                     shell.                                   │
-│ --show-completion                   Show completion for the current shell,   │
-│                                     to copy it or customize the              │
-│                                     installation.                            │
-│ --help                              Show this message and exit.              │
-╰───────────────
+                                                                                   
+ Usage: ouseful_ouxml2mm [OPTIONS] SOURCE...                                      
+                                                                                  
+ Generate a mindmap view from one or more XML or Jupyter Notebook files.          
+                                                                                  
+╭─ Arguments ────────────────────────────────────────────────────────────────────╮
+│ *    source      SOURCE...  Source file(s), directory, or glob pattern         │
+│                             [default: None]                                    │
+│                             [required]                                         │
+╰────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ──────────────────────────────────────────────────────────────────────╮
+│ --type                -t      TEXT  File type to process: 'xml' or 'ipynb'     │
+│                                     [default: xml]                             │
+│ --modulecode          -m      TEXT  Module code [default: MODULE]              │
+│ --output              -o      FILE  Output filename or path/filename           │
+│                                     [default: None]                            │
+│ --use-treemap         -u            Use treemap                                │
+│ --install-completion                Install completion for the current shell.  │
+│ --show-completion                   Show completion for the current shell, to  │
+│                                     copy it or customize the installation.     │
+│ --help                              Show this message and exit.                │
+╰────────────────────────────────────────────────────────────────────────────────╯
 
 ```
 

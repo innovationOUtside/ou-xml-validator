@@ -225,7 +225,7 @@ template_jsmind_html = """
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>jsMind</title>
+        <title>{title}</title>
         <link
             type="text/css"
             rel="stylesheet"
@@ -318,7 +318,7 @@ def digraph_to_jsmind_format(G, json_format=False):
 # if leaf, return value;
 
 
-def generate_mindmap(DG, filename=None, typ="jsmind"):
+def generate_mindmap(DG, filename=None, typ="jsmind", title="course map"):
     """Save a networkx graph as a JSON file."""
     filename = "testmm.html" if filename is None else filename
 
@@ -341,7 +341,7 @@ def generate_mindmap(DG, filename=None, typ="jsmind"):
             #    o.write(jsondata)
 
             with open(filename, "w") as f:
-                f.write(template_jsmind_html.format(full_node_array=jsondata))
+                f.write(template_jsmind_html.format(full_node_array=jsondata, title=title))
 
             print(f"Mindmap output HTML file: {filename}")
 
@@ -403,11 +403,150 @@ def plotly_treemap(DG, filename=None, display=True):
         fig.show()
 
 
+# -- notebook mindmapper from claude.ai
+import json
+import re
+from nbformat import read as read_notebook
+
+
+def extract_headings_from_markdown(markdown_text, max_level=6):
+    """
+    Extract headings from markdown text, ignoring code blocks.
+
+    Args:
+    markdown_text (str): The markdown text to parse
+    max_level (int): The maximum heading level to extract (default: 6)
+
+    Returns:
+    list of tuples: (heading level, heading text)
+    """
+    # Remove code blocks
+    code_block_pattern = r"```[\s\S]*?```"
+    markdown_text = re.sub(code_block_pattern, "", markdown_text)
+
+    # Extract headings
+    heading_pattern = r"^(#{1," + str(max_level) + r"})\s+(.+)$"
+    headings = []
+
+    for line in markdown_text.split("\n"):
+        match = re.match(heading_pattern, line)
+        if match:
+            level = len(match.group(1))
+            text = match.group(2).strip()
+            headings.append((level, text))
+
+    return headings
+
+
+def parse_jupyter_notebook(notebook_path, max_heading_level=6):
+    """
+    Parse a Jupyter notebook and extract headings from markdown cells.
+
+    Args:
+    notebook_path (str): Path to the Jupyter notebook file
+    max_heading_level (int): Maximum heading level to extract (default: 6)
+
+    Returns:
+    list of tuples: (heading level, heading text)
+    """
+    with open(notebook_path, "r", encoding="utf-8") as f:
+        notebook = read_notebook(f, as_version=4)
+
+    all_headings = []
+
+    for cell in notebook.cells:
+        if cell.cell_type == "markdown":
+            cell_headings = extract_headings_from_markdown(
+                cell.source, max_heading_level
+            )
+            all_headings.extend(cell_headings)
+
+    return all_headings
+
+
+def integrate_notebook_headings(DG, notebook_path, parent_node, current_node):
+    """
+    Integrate headings from a Jupyter notebook into the existing graph structure.
+
+    Args:
+    DG (networkx.DiGraph): The existing graph
+    notebook_path (str): Path to the Jupyter notebook file
+    parent_node (int): The node ID to attach the notebook node to
+    current_node (int): The current node ID for new nodes
+
+    Returns:
+    tuple: (Updated DiGraph, Next available node ID)
+    """
+    headings = parse_jupyter_notebook(notebook_path)
+
+    # Create a node for the notebook itself
+    notebook_name = Path(notebook_path).stem
+    DG, notebook_node = gNodeAdd(
+        DG, parent_node, current_node, notebook_name, {"typ": "notebook"}
+    )
+    current_node += 1
+
+    level_to_node = {0: notebook_node}
+
+    for level, text in headings:
+        # Find the closest parent level
+        parent_level = max(l for l in level_to_node.keys() if l < level)
+        parent = level_to_node[parent_level]
+
+        DG, current_node = gNodeAdd(
+            DG, parent, current_node, text, {"typ": f"notebook_h{level}"}
+        )
+        level_to_node[level] = current_node
+        current_node += 1
+
+    return DG, current_node
+
+
+def process_directory(DG, dir_path, parent_node, current_node):
+    """
+    Process a directory, creating nodes for subdirectories and notebooks.
+
+    Args:
+    DG (networkx.DiGraph): The existing graph
+    dir_path (Path): Path to the directory
+    parent_node (int): The node ID to attach this directory to
+    current_node (int): The current node ID for new nodes
+
+    Returns:
+    tuple: (Updated DiGraph, Next available node ID)
+    """
+    # Create a node for the directory
+    dir_name = dir_path.name
+    DG, dir_node = gNodeAdd(
+        DG, parent_node, current_node, dir_name, {"typ": "directory"}
+    )
+    current_node += 1
+
+    # Process subdirectories
+    for subdir in sorted(dir_path.glob("*")):
+        if subdir.is_dir():
+            DG, current_node = process_directory(DG, subdir, dir_node, current_node)
+
+    # Process notebooks in this directory
+    for notebook in sorted(dir_path.glob("*.ipynb")):
+        DG, current_node = integrate_notebook_headings(
+            DG, str(notebook), dir_node, current_node
+        )
+
+    return DG, current_node
+
+
 @app.command()
 def convert_to_mindmap(
     source: list[str] = typer.Argument(
         ...,
         help="Source file(s), directory, or glob pattern",
+    ),
+    file_type: str = typer.Option(
+        "xml",
+        "--type",
+        "-t",
+        help="File type to process: 'xml' or 'ipynb'",
     ),
     modulecode: str = typer.Option("MODULE", "--modulecode", "-m", help="Module code"),
     output_file: Path = typer.Option(
@@ -420,39 +559,51 @@ def convert_to_mindmap(
         writable=True,
         resolve_path=True,
     ),
-    use_treemap: bool = typer.Option(False, "--use-treemap", "-t", help="Use treemap"),
-):  # noqa: FBT001 FBT002
-    """Generate a mindmap view from one or more OU-XML files."""
-    # Check if the source is a directory
-    xmls = []
+    use_treemap: bool = typer.Option(False, "--use-treemap", "-u", help="Use treemap"),
+):
+    """Generate a mindmap view from one or more XML or Jupyter Notebook files."""
+    if file_type not in ["xml", "ipynb"]:
+        raise typer.BadParameter("File type must be either 'xml' or 'ipynb'")
+
+    srctyp = "-nb" if file_type=="ipynb" else "-VLE"
     if output_file is None:
         subscript = "_tm" if use_treemap else "_mm"
-        output_file = f"{modulecode}{subscript}.html"
+        output_file = f"{modulecode}{subscript}{srctyp}.html"
+
+    DG = nx.DiGraph()
+    DG = simpleRoot(DG, f"{modulecode}{srctyp}", 1)
+    current_node = 2  # Start from 2 as 1 is the root node
+
     for path in source:
-        # Expand glob patterns
-        expanded_paths = glob.glob(path, recursive=True)
-        if not expanded_paths:
-            # If glob didn't match anything, treat it as a literal path
-            expanded_paths = [path]
+        path = Path(path)
+        if path.is_dir():
+            if file_type == "ipynb":
+                DG, current_node = process_directory(DG, path, 1, current_node)
+            else:  # xml
+                for xml_file in sorted(path.glob("*.xml")):
+                    with open(xml_file, "r", encoding="utf-8") as f:
+                        xml_content = f.read()
+                    DG, current_node = module_mindmapper(
+                        DG=DG, currnode=current_node, rootnode=1, xmls=[xml_content]
+                    )
+        elif path.is_file():
+            if file_type == "ipynb" and path.suffix.lower() == ".ipynb":
+                DG, current_node = integrate_notebook_headings(
+                    DG, str(path), 1, current_node
+                )
+            elif file_type == "xml" and path.suffix.lower() == ".xml":
+                with open(path, "r", encoding="utf-8") as f:
+                    xml_content = f.read()
+                DG, current_node = module_mindmapper(
+                    DG=DG, currnode=current_node, rootnode=1, xmls=[xml_content]
+                )
 
-        for path in expanded_paths:
-            path = Path(path)
-            if path.is_dir():
-                # Process all files in the directory
-                for file in sorted(path.glob("*.xml")):  # Adjust the pattern as needed
-                    with open(file) as f:
-                        xmls.append(f.read())
-            else:
-                # Process individual file
-                with open(path) as f:
-                    xmls.append(f.read())
+    if use_treemap:
+        plotly_treemap(DG, filename=output_file, display=False)
+    else:
+        generate_mindmap(DG, filename=output_file, title=modulecode)
 
-    if xmls:
-        DG, _ = module_mindmapper(modulecode=modulecode, xmls=xmls)
-        if use_treemap:
-            plotly_treemap(DG, filename=output_file, display=False)
-        else:
-            generate_mindmap(DG, filename=output_file)
+    typer.echo(f"Mindmap generated: {output_file}")
 
 
 def main():
