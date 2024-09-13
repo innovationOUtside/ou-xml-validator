@@ -98,7 +98,7 @@ Generate interactive views over the heading structures of one or more OU-XML fil
 
 Usage: ouseful_ouxml2mm [OPTIONS] SOURCE...                                    
                                                                                 
- Convert an OU-XML file into markdown.                                          
+ Generate a treemap view over one or more OU-XML files.                                          
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
 │ *    source      SOURCE...  Source file(s), directory, or glob pattern       │
@@ -142,7 +142,6 @@ For PyPi releases:
 
 - build as: `python3 -m build`
 - push to PyPi: `twine upload --skip-existing dist/*`
-
 
 ## TESTING
 

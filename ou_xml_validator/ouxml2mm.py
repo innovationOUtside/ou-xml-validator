@@ -422,7 +422,7 @@ def convert_to_mindmap(
     ),
     use_treemap: bool = typer.Option(False, "--use-treemap", "-t", help="Use treemap"),
 ):  # noqa: FBT001 FBT002
-    """Convert an OU-XML file into markdown."""
+    """Generate a mindmap view from one or more OU-XML files."""
     # Check if the source is a directory
     xmls = []
     if output_file is None:
@@ -439,7 +439,7 @@ def convert_to_mindmap(
             path = Path(path)
             if path.is_dir():
                 # Process all files in the directory
-                for file in path.glob("*.xml"):  # Adjust the pattern as needed
+                for file in sorted(path.glob("*.xml")):  # Adjust the pattern as needed
                     with open(file) as f:
                         xmls.append(f.read())
             else:
