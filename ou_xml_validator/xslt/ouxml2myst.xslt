@@ -741,6 +741,12 @@ kernelspec:
     </xsl:template>
 
 
+    <xsl:template match="SubHeading">
+        <xsl:text>&#xa;&#xa;## </xsl:text>
+        <xsl:value-of select="." />
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:template>
+
     <!-- how do we handle this? -->
     <xsl:template match="CrossRef">
         <a href="{idref}">

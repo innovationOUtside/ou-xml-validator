@@ -4,7 +4,7 @@ Simple tests of mapping Sphinx XML to desired OU-XML tags.
 
 import pytest
 from roundtrip_data import round_trip_test_list, OU_XML, SPHINX_XML, MYST
-from utils import (
+from ou_xml_validator.utils import (
     apply_xslt,
     pretty_xml_from_root,
     root_from_xml_string,

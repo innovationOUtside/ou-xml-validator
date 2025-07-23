@@ -5,10 +5,10 @@ Simple tests of mapping OU-XML to desired markdown output.
 # TO DO - try to normalise by writing pretty xml for comparison
 
 import pytest
-from utils import apply_xslt
+from ou_xml_validator.utils import apply_xslt
 from roundtrip_data import round_trip_test_list, OU_XML, SPHINX_XML, MYST
 
-XSLT_PATH = "ou_xml_validator/xslt/ouxml2md.xslt"
+XSLT_PATH = "ou_xml_validator/xslt/ouxml2myst.xslt"
 
 test_list = [(i[OU_XML], i[MYST]) for i in round_trip_test_list]
 

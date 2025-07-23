@@ -109,7 +109,7 @@ def convert_to_markdown(
     regenerate: bool = False,
     numbering_from: int = 1,
 ):  # noqa: FBT001 FBT002
-    """Convert an OU-XML file into markdown."""
+    """Convert an OU-XML file into tiddlywiki format."""
     if Path(config).is_file():
         with open(Path(config)) as in_f:
             config = safe_load(in_f)
